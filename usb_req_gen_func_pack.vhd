@@ -29,15 +29,15 @@ package body usb_req_gen_func_pack is
   -- usb_request_packet: std_logic_vector(71 downto 0) := x"001122334455667788"
   -- this function will return 88-bit vector ready for transmission.
   -- 00 will be sent first, 88 last and then crc. 
-  function usb_packet_gen(in_data: in std_logic_vector(71 downto 0))
+  function usb_packet_gen(nrzstream: in std_logic_vector(71 downto 0))
   return std_logic_vector is
-    variable bit_reorder: std_logic_vector(in_data'range);
+    variable bit_reorder: std_logic_vector(nrzstream'range);
     variable crc: std_logic_vector(15 downto 0);
-    variable result: std_logic_vector(in_data'high+crc'length downto 0);
+    variable result: std_logic_vector(nrzstream'high+crc'length downto 0);
   begin
     crc := x"0000";
-    for i in 0 to in_data'high/8 loop
-      bit_reorder(8*(i+1)-1 downto 8*i) := reverse_any_vector(in_data(8*(i+1)-1 downto 8*i));
+    for i in 0 to nrzstream'high/8 loop
+      bit_reorder(8*(i+1)-1 downto 8*i) := reverse_any_vector(nrzstream(8*(i+1)-1 downto 8*i));
     end loop;
     crc := x"AA55";
     result := bit_reorder & crc;
