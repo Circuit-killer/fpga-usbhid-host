@@ -131,6 +131,8 @@ constant REPORT_LEN:integer:=9; -- bytes report length
 
 signal step_ps3_test:integer range 0 to 11:=0;
 
+
+
 begin
 
 process(CLK7_5MHz) is
@@ -317,15 +319,17 @@ process(CLK7_5MHz) is
 	variable joystick_button3_mem:std_logic:='0';
 	variable joystick_button4_mem:std_logic:='0';
 	
+	
+	
 begin
 step_ps3_test<=step_ps3;
 if rising_edge(CLK7_5MHz) then
 
-	--LEDS<=conv_std_logic_vector(step_cmd,8);
+	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
-	for i in 0 to 7 loop
-	  -- LEDS(i)<=JOY_mem(i + 8*conv_integer(PLAGE));
+	for i in 4 to 7 loop
+	  --LEDS(i)<=JOY_mem(i + 8*conv_integer(PLAGE));
 	  LEDS(i)<= JOY_mem(i + 8*0)
 	        xor JOY_mem(i + 8*1)
 	        xor JOY_mem(i + 8*2)
@@ -1537,19 +1541,19 @@ if next_cmd then
 			step_cmd:=6;
 		when 1=>
 --		        trame_set(ADDR0_ENDP0,SET_ADDRESS_1); -- no OUT
---			step_cmd:=2;
+			step_cmd:=2;
 		when 2=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_DEVICE_12h);
---			step_cmd:=7;
+			step_cmd:=7;
 		when 3=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_CONFIG_FFh);
---			step_cmd:=4;
+			step_cmd:=4;
 		when 4=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_0_FFh);
---			step_cmd:=5;
+			step_cmd:=5;
 		when 5=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_2_FFh);
---			step_cmd:=6;
+			step_cmd:=6;
 		when 6=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h); -- encore ?
 			step_cmd:=7;
@@ -1561,10 +1565,10 @@ if next_cmd then
 			step_cmd:=9;
 		when 9=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
-			step_cmd:=10;
+			step_cmd:=11;
 		when 10=>
---			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick doesn't work if this is enabled
---			step_cmd:=11;
+--			trame_set(ADDR0_ENDP0,C_SET_IDLE_0);
+			step_cmd:=11;
 		when 11=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
 			step_cmd:=12;
