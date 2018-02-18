@@ -10,7 +10,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 library ecp5u;
 use ecp5u.components.all;
 
--- test USB helper functions
+-- USB packet generator functions
 use work.usb_req_gen_func_pack.all;
 
 entity ulx3s_usbtest is
@@ -187,10 +187,11 @@ begin
     plage => "100",
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
-    leds => open
+    leds => led
   );
   end generate;
 
+  -- small test suite for usb packet generator
   -- led <= reverse_any_vector(x"07");
   -- led <= DATA0;
   -- led <= GET_DESCRIPTOR_DEVICE_40h(87 downto 87-7);
@@ -201,9 +202,9 @@ begin
   -- led <= usb_data_gen(crc16_test_message) (15 downto 8);
 
   --led <= x"01" when ADDR1_ENDP1 = usb_token_gen(C_ADDR1_ENDP1)
-  led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
+  --led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
   --led <= x"01" when SET_ADDRESS_1 = usb_data_gen(C_SET_ADDRESS_1)
   --led <= x"01" when GET_DESCRIPTOR_DEVICE_40h = usb_data_gen(C_GET_DESCRIPTOR_DEVICE_40h)
-    else x"55"; -- this is shown if test failed
+  --  else x"55"; -- this is shown if test failed
 
 end Behavioral;
