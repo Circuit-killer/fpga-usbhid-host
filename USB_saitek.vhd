@@ -3,6 +3,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.std_logic_arith.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+use work.usb_req_gen_func_pack.all;
+
 entity USB_saitek is
     Port ( CLK7_5MHz : in  STD_LOGIC;
 	 -- 60MHz=50*6/5 MHz -- 60/5=12 MHz
@@ -71,6 +73,29 @@ constant GET_DESCRIPTOR_CONFIG_29h   :std_logic_vector(11*8-1 downto 0):=DATA0 &
 constant SET_CONFIGURATION_1	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000000" & "10010000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1110010010100100";
 constant GET_INTERFACE_0	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000100" & "01010000" & "00000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "0110101100000100";
 constant GET_DESCRIPTOR_REPORT_B7h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000001" & "01100000" & "00000000"&"01000100" & "00000000"&"00000000" & "11101101"&"00000000" & "1111100111110101";
+
+-- saitek cyborg joystick constants using packet generator function
+constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- DATA0 is reversed bit order
+-- modprobe usbmon
+-- chown user:user /dev/usbmon*
+-- wireshark
+-- plug joystick and move it or replug few times in/out
+-- to find out which usbmon device receives its traffic, then select it to capture
+-- plug joystick in
+-- find 8-byte data from sniffed "URB setup" source host
+-- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"8006000100001200":
+-- and at the end of this file, configure state machine to replay all packets to the joystick
+constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000100001200");
+constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200000900");
+constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200002900");
+constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"0009010000000000");
+constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"210a000000000000");
+constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8106002200007702");
+constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
+constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
+constant C_ADDR1_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000001");
+constant C_ADDR1_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000001");
+--
 
 constant OUT_OUT:std_logic_vector(7 downto 0):="10000111";
 constant OUT_DATA1:std_logic_vector(3*8-1 downto 0):=DATA1 & "0000000000000000";
@@ -1504,47 +1529,43 @@ if next_cmd then
 	next_cmd:=false;
 	case (step_cmd) is
 		when 0=>
-			--trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_DEVICE_12h); -- no OUT
-			--step_cmd:=1;
-			trame_set(ADDR0_ENDP0,SET_ADDRESS_1); -- no OUT
-			step_cmd:=2;
-			--step_cmd:=11;
-		when 1=>
-		when 2=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_DEVICE_12h);
-			--step_cmd:=3;
-			step_cmd:=7;
-		when 3=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_CONFIG_FFh);
-			step_cmd:=4;
-		when 4=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_STRING_0_FFh);
-			step_cmd:=5;
-		when 5=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_STRING_2_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
 			step_cmd:=6;
+		when 1=>
+--		        trame_set(ADDR0_ENDP0,SET_ADDRESS_1); -- no OUT
+--			step_cmd:=2;
+		when 2=>
+--			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_DEVICE_12h);
+--			step_cmd:=7;
+		when 3=>
+--			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_CONFIG_FFh);
+--			step_cmd:=4;
+		when 4=>
+--			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_0_FFh);
+--			step_cmd:=5;
+		when 5=>
+--			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_2_FFh);
+--			step_cmd:=6;
 		when 6=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_DEVICE_12h); -- encore ?
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h); -- encore ?
 			step_cmd:=7;
 		when 7=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_CONFIG_09h);
-			--step_cmd:=8;
-			step_cmd:=10;
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
+			step_cmd:=8;
 		when 8=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_CONFIG_29h);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
 			step_cmd:=9;
 		when 9=>
-			trame_set(ADDR1_ENDP0,SET_CONFIGURATION_1); -- no OUT
-			step_cmd:=10;
+			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			step_cmd:=11;
 		when 10=>
-			trame_set(ADDR1_ENDP0,GET_INTERFACE_0); -- no OUT
-			--step_cmd:=11;
+			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- no OUT
 			step_cmd:=12;
 		when 11=>
-			trame_read(ADDR1_ENDP0,GET_DESCRIPTOR_REPORT_B7h);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
 			step_cmd:=12;
 		when 12=>
-			plug(ADDR1_ENDP1);
+			plug(C_ADDR0_ENDP1);
 	end case;
 end if;
 
