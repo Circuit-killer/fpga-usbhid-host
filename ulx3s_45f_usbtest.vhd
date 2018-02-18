@@ -76,9 +76,44 @@ end;
 architecture Behavioral of ulx3s_usbtest is
   signal clk_100MHz, clk_60MHz, clk_7M5Hz, clk_12MHz: std_logic;
   signal R_blinky: std_logic_vector(26 downto 0);
-  
+
+  -----8<----- cut here -----8<-----  
+  -- testing generation of USB messages
   constant usb_message: std_logic_vector(71 downto 0) := x"031122334455667788";
   constant crc16_test_message: std_logic_vector(31 downto 0) := "00000000000000010000001000000011";
+
+  -- those bytes are already reversed in transmission order
+  constant ACK  :std_logic_vector(7 downto 0):="01001011";
+  constant NACK :std_logic_vector(7 downto 0):="01011010";
+  constant STALL:std_logic_vector(7 downto 0):="01110001";
+  constant DATA1:std_logic_vector(7 downto 0):="11010010";
+  constant DATA0:std_logic_vector(7 downto 0):="11000011";
+  constant SETUP:std_logic_vector(7 downto 0):="10110100";
+  
+  -- reversing them back to become readable
+  constant C_ACK  :std_logic_vector(7 downto 0):=reverse_any_vector("01001011");
+  constant C_NACK :std_logic_vector(7 downto 0):=reverse_any_vector("01011010");
+  constant C_STALL:std_logic_vector(7 downto 0):=reverse_any_vector("01110001");
+  constant C_DATA1:std_logic_vector(7 downto 0):=reverse_any_vector("11010010");
+  constant C_DATA0:std_logic_vector(7 downto 0):=reverse_any_vector("11000011");
+  constant C_SETUP:std_logic_vector(7 downto 0):=reverse_any_vector("10110100");
+
+  -- those probably contain 5-bit CRC
+  constant ADDR0_ENDP0:std_logic_vector(11+5-1 downto 0):="00000000000" & "01000";
+  constant ADDR1_ENDP0:std_logic_vector(11+5-1 downto 0):="10000000000" & "10111";
+  constant ADDR1_ENDP1:std_logic_vector(11+5-1 downto 0):="10000001000" & "11010";
+
+  -- all bits reversed and CRC
+  constant GET_DESCRIPTOR_DEVICE_40h : std_logic_vector(11*8-1 downto 0) := DATA0 & "00000001" & "01100000" & "00000000"&"10000000" & "00000000"&"00000000" & "00000010"&"00000000" & "1011101100101001";
+  constant SET_ADDRESS_1             : std_logic_vector(11*8-1 downto 0) := DATA0 & "00000000" & "10100000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1101011110100100";
+  constant GET_DESCRIPTOR_REPORT_B7h : std_logic_vector(11*8-1 downto 0) := DATA0 & "10000001" & "01100000" & "00000000"&"01000100" & "00000000"&"00000000" & "11101101"&"00000000" & "1111100111110101";
+
+  -- readable form without CRC
+  constant C_GET_DESCRIPTOR_DEVICE_40h : std_logic_vector(9*8-1 downto 0) := reverse_any_vector(DATA0) & x"8006000100004000";
+  constant C_SET_ADDRESS_1             : std_logic_vector(9*8-1 downto 0) := reverse_any_vector(DATA0) & x"0005010000000000";
+  constant C_GET_DESCRIPTOR_REPORT_B7h : std_logic_vector(9*8-1 downto 0) := reverse_any_vector(DATA0) & x"810600220000B700";
+  constant C_ADDR1_ENDP1 : std_logic_vector(10 downto 0) := "00010000001";
+  -----8<----- cut here -----8<-----  
 
 begin
   clk_pll: entity work.clk_25M_100M_7M5_12M_60M
@@ -155,10 +190,20 @@ begin
     leds => open
   );
   end generate;
-  
-  --led <= reverse_any_vector(x"07");
-  --led <= usb_packet_gen(usb_message) (87 downto 87-7);
-  -- led <= usb_packet_gen(crc16_test_message) (7 downto 0);
-  led <= usb_packet_gen(crc16_test_message) (15 downto 8);
-  
+
+  -- led <= reverse_any_vector(x"07");
+  -- led <= DATA0;
+  -- led <= GET_DESCRIPTOR_DEVICE_40h(87 downto 87-7);
+  -- led <= CN_GET_DESCRIPTOR_DEVICE_40h(87 downto 87-7);
+  -- led <= GET_DESCRIPTOR_DEVICE_40h(7 downto 0);
+  -- led <= CN_GET_DESCRIPTOR_DEVICE_40h(15 downto 8);
+  -- led <= usb_data_gen(crc16_test_message) (7 downto 0);
+  -- led <= usb_data_gen(crc16_test_message) (15 downto 8);
+
+  --led <= x"01" when ADDR1_ENDP1 = usb_token_gen(C_ADDR1_ENDP1)
+  led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
+  --led <= x"01" when SET_ADDRESS_1 = usb_data_gen(C_SET_ADDRESS_1)
+  --led <= x"01" when GET_DESCRIPTOR_DEVICE_40h = usb_data_gen(C_GET_DESCRIPTOR_DEVICE_40h)
+    else x"55"; -- this is shown if test failed
+
 end Behavioral;
