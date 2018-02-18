@@ -1538,21 +1538,21 @@ if next_cmd then
 	case (step_cmd) is
 		when 0=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
-			step_cmd<=6;
+			step_cmd<=1;
 		when 1=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
 			step_cmd<=2;
 		when 2=>
---			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_DEVICE_12h);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
 			step_cmd<=3;
 		when 3=>
---			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_CONFIG_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 			step_cmd<=4;
 		when 4=>
---			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_0_FFh);
+--			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
 			step_cmd<=5;
 		when 5=>
---			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_2_FFh);
+--			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=6;
 		when 6=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
