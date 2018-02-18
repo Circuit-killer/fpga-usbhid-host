@@ -93,7 +93,7 @@ constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb
 constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"800601030904FF00");
 constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"800602030904FF00");
 constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"0009010000000000");
-constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"210a000000000000");
+constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"210A000000000000");
 constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8106002200007702");
 constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
 constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
@@ -428,9 +428,6 @@ crc5_value:=(others=>'0');
 				else
 					counter_RESET:=counter_RESET+1;
 				end if;
-			
-
-
 			--=====================================================
 			-- TRAME SET (SOF,TRAME_SET_SETUP,TRAME_SET_DATA0,ACK)
 			--=====================================================
@@ -711,13 +708,6 @@ crc5_value:=(others=>'0');
 						counter_TRAME:=counter_TRAME+1;
 					end if;
 				end if;
-
-
-
-
-
-
-
 			--========================================================
 			-- TRAME_GET (SOF, TRAME_GET_SETUP, TRAME_GET_DATA0, ACK)
 			--========================================================
@@ -1024,12 +1014,6 @@ crc5_value:=(others=>'0');
 						counter_TRAME:=counter_TRAME+1;
 					end if;
 				end if;				
-				
-				
-				
-				
-				
-				
 			when 41=>
 				-- envoyer un NACK
 				if counter_PAS=DEMI_PAS then
@@ -1183,31 +1167,6 @@ crc5_value:=(others=>'0');
 					time_out:=true;
 					step_ps3:=29; -- next SOF
 				end if;
-				
-				
-			
-				
-
-				
-				
-				
-				
-				
-	
-
-
-
-
-
-
-
-
-
-
-
-			
-			
-			
 			--=============================
 			-- PLUG (SOF,IN_ADDR_ENDP,ACK)
 			--=============================
@@ -1496,43 +1455,6 @@ crc5_value:=(others=>'0');
 	end if;
 				
 
-
-
---SETUP 00000000000 DATA0 00000001 01100000 00000000_10000000 00000000_00000000 00000010_00000000
---GET_DESCRIPTOR_DEVICE length=40h
---SETUP 00000000000 DATA0 00000000 10100000 10000000_00000000 00000000_00000000 00000000_00000000
---SET_ADDRESS 1
---SETUP 10000000000 DATA0 00000001 01100000 00000000_10000000 00000000_00000000 01001000_00000000
---GET_DESCRIPTOR_DEVICE length=12h
---SETUP 10000000000 DATA0 00000001 01100000 00000000_01000000 00000000_00000000 11111111_00000000
---GET_DESCRIPTOR_CONFIG length=FFh
---SETUP 10000000000 DATA0 00000001 01100000 00000000_11000000 00000000_00000000 11111111_00000000
---GET_DESCRIPTOR_STRING length=FFh
---SETUP 10000000000 DATA0 00000001 01100000 01000000_11000000 10010000_00100000 11111111_00000000
---GET_DESCRIPTOR_STRING length=FFh
---SETUP 10000000000 DATA0 00000001 01100000 00000000_10000000 00000000_00000000 01001000_00000000
---GET_DESCRIPTOR_DEVICE length=12h
---SETUP 10000000000 DATA0 00000001 01100000 00000000_01000000 00000000_00000000 10010000_00000000
---GET_DESCRIPTOR_CONFIG length=09h
---SETUP 10000000000 DATA0 00000001 01100000 00000000_01000000 00000000_00000000 10010100_00000000
---GET_DESCRIPTOR_CONFIG length=29h
---SETUP 10000000000 DATA0 00000000 10010000 10000000_00000000 00000000_00000000 00000000_00000000
---SET_CONFIGURATION 1
---SETUP 10000000000 DATA0 10000100 01010000 00000000_00000000 00000000_00000000 00000000_00000000
---GET_INTERFACE 0
---SETUP 10000000000 DATA0 10000001 01100000 00000000_01000100 00000000_00000000 11101101_00000000
---GET_DESCRIPTOR_? length=B7h
---IN 10000001000
---...
-
-
--- il y a trois pattern :
--- -les SETUP :
---   -SET_ADDRESS, SET_CONFIGURATION,GET_INTERFACE, qui IN jusqu'à NO_DATA et ACK simplement
---   -ceux qui attendent des réponses IN jusqu'à (DATA_SIZE<DATA_MAX_SIZE or else NO_DATA) et qui OUT du coup et attendent le ACK
---     ==>DATA_SIZE ne peut pas être déterminé avant la fin d'un crc16 (cad un EOP), et le crc16 ne peut pas être déterminé sans un stuff_inv. il faut donc compter la taille du tout, en unstuff pour déterminer DATA_SIZE.
--- -le IN qui réceptionne la donnée du joystick
-
 if next_cmd then
 	next_cmd:=false;
 	case (step_cmd) is
@@ -1558,17 +1480,17 @@ if next_cmd then
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=7;
 		when 7=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
+			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 			step_cmd<=8;
 		when 8=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
+			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 			step_cmd<=9;
 		when 9=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 			step_cmd<=10;
 		when 10=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
---			trame_set(ADDR0_ENDP0,C_SET_IDLE_0);
+--			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
 			step_cmd<=11;
 		when 11=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
