@@ -1549,10 +1549,10 @@ if next_cmd then
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 			step_cmd<=4;
 		when 4=>
---			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
 			step_cmd<=5;
 		when 5=>
---			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=6;
 		when 6=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
@@ -1572,7 +1572,7 @@ if next_cmd then
 		when 11=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
 			step_cmd<=12;
-		when 12=>
+		when others =>
 			plug(C_ADDR0_ENDP1);
 	end case;
 end if;
