@@ -31,33 +31,35 @@ package body usb_req_gen_func_pack is
   -- 00 will be sent first, 88 last and then crc. 
   -- test it with perl script:
   -- ./crc16.pl 00000000100000000100000011000000 <- input nrz stream
-  -- 1111011101011110 <- this is correct response
-  function usb_packet_gen(nrzstream: in std_logic_vector)
+  -- 1111011101011110 <- this is correct CRC
+  -- compare same with this function (bits of input bytes are reverse ordered)
+  -- usb_packet_gen("00000000000000010000001000000011") = "1111011101011110"
+  function usb_packet_gen(input_data: in std_logic_vector)
   return std_logic_vector is
-    variable bit_reorder: std_logic_vector(nrzstream'range);
+    variable nrzstream: std_logic_vector(input_data'range);
     variable crc: std_logic_vector(15 downto 0);
-    constant g: std_logic_vector(crc'range) := "1000000000000101"; -- CRC generator polynomial x^16+x^15+x^2+x^1
-    variable result: std_logic_vector(nrzstream'high+crc'length downto 0);
-    variable nextb, crcmsb: std_logic;
+    constant generator_polynomial: std_logic_vector(crc'range) := "1000000000000101"; -- (x^16)+x^15+x^2+x^1
+    variable result: std_logic_vector(input_data'high+crc'length downto 0);
+    variable nextb, crc_msb: std_logic;
   begin
-    -- reorder input data into nrzstream ready for transmission
-    for i in 0 to nrzstream'high/8 loop
-      bit_reorder(8*(i+1)-1 downto 8*i) := reverse_any_vector(nrzstream(8*(i+1)-1 downto 8*i));
+    -- reverse bit order of every byte in input data
+    -- to create nrzstream ready for transmission
+    for i in 0 to input_data'high/8 loop
+      nrzstream(8*(i+1)-1 downto 8*i) := reverse_any_vector(input_data(8*(i+1)-1 downto 8*i));
     end loop;
-    bit_reorder := nrzstream; -- for now just copy
     -- process each bit, accumulating the crc
     crc := x"FFFF"; -- start with all bits 1
-    for i in bit_reorder'high downto 0 loop
-      -- nextb := bit_reorder(nrzstream'high - i);
-      nextb := bit_reorder(i);
-      crcmsb := crc(crc'high); -- remember MSB before shifting
+    for i in nrzstream'high downto 0 loop
+      -- nextb := nrzstream(nrzstream'high - i);
+      nextb := nrzstream(i);
+      crc_msb := crc(crc'high); -- remember CRC MSB before shifting
       crc := crc(crc'high-1 downto 0) & '0'; -- shift 1 bit left, LSB=0, delete MSB
-      if nextb /= crcmsb then
-        crc := crc xor g; -- xor with generator polynomial
+      if nextb /= crc_msb then
+        crc := crc xor generator_polynomial;
       end if;
     end loop;
-    crc := crc xor x"FFFF"; -- final invert all bits
-    result := bit_reorder & crc;
+    crc := crc xor x"FFFF"; -- finally invert all CRC bits
+    result := nrzstream & crc;
     return result;
   end; -- function usb_packet_gen
 end package body;
