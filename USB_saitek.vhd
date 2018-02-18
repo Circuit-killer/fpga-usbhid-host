@@ -131,13 +131,13 @@ constant REPORT_LEN:integer:=9; -- bytes report length
 
 signal step_ps3_test:integer range 0 to 11:=0;
 
-
+signal step_cmd: integer range 0 to 12 := 0;
 
 begin
 
 process(CLK7_5MHz) is
 	variable step_ps3:integer range 0 to 41:=0;
-	variable step_cmd:integer range 0 to 12:=0;
+	-- variable step_cmd:integer range 0 to 12:=0;
 	variable next_cmd:boolean:=false;
 	variable counter_RESET:integer range 0 to period_RESET*PAS:=0;
 	variable counter_IDLE:integer range 0 to period_IDLE+period_EOP:=0;
@@ -1538,40 +1538,40 @@ if next_cmd then
 	case (step_cmd) is
 		when 0=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
-			step_cmd:=6;
+			step_cmd<=6;
 		when 1=>
---		        trame_set(ADDR0_ENDP0,SET_ADDRESS_1); -- no OUT
-			step_cmd:=2;
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			step_cmd<=2;
 		when 2=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_DEVICE_12h);
-			step_cmd:=7;
+			step_cmd<=3;
 		when 3=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_CONFIG_FFh);
-			step_cmd:=4;
+			step_cmd<=4;
 		when 4=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_0_FFh);
-			step_cmd:=5;
+			step_cmd<=5;
 		when 5=>
 --			trame_read(ADDR0_ENDP0,GET_DESCRIPTOR_STRING_2_FFh);
-			step_cmd:=6;
+			step_cmd<=6;
 		when 6=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h); -- encore ?
-			step_cmd:=7;
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			step_cmd<=7;
 		when 7=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
-			step_cmd:=8;
+			step_cmd<=8;
 		when 8=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
-			step_cmd:=9;
+			step_cmd<=9;
 		when 9=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
-			step_cmd:=11;
+			step_cmd<=11;
 		when 10=>
 --			trame_set(ADDR0_ENDP0,C_SET_IDLE_0);
-			step_cmd:=11;
+			step_cmd<=11;
 		when 11=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
-			step_cmd:=12;
+			step_cmd<=12;
 		when 12=>
 			plug(C_ADDR0_ENDP1);
 	end case;
