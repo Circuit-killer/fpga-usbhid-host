@@ -77,7 +77,7 @@ architecture Behavioral of ulx3s_usbtest is
   signal clk_100MHz, clk_60MHz, clk_7M5Hz, clk_12MHz: std_logic;
   signal R_blinky: std_logic_vector(26 downto 0);
   
-  constant usb_message: std_logic_vector(71 downto 0) := x"001122334455667788";
+  constant usb_message: std_logic_vector(71 downto 0) := x"031122334455667788";
   
 begin
   clk_pll: entity work.clk_25M_100M_7M5_12M_60M
@@ -156,6 +156,6 @@ begin
   end generate;
   
   --led <= reverse_any_vector(x"07");
-  led <= usb_packet_gen(usb_message)(15 downto 8);
+  led <= usb_packet_gen(usb_message) (87 downto 87-7);
   
 end Behavioral;

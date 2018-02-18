@@ -36,8 +36,8 @@ package body usb_req_gen_func_pack is
     variable result: std_logic_vector(in_data'high+crc'length downto 0);
   begin
     crc := x"0000";
-    for i in 0 to in_data'length/8-1 loop
-      bit_reorder(8*(i+1)-1 downto 8*i) := in_data(8*(i+1)-1 downto 8*i);
+    for i in 0 to in_data'high/8 loop
+      bit_reorder(8*(i+1)-1 downto 8*i) := reverse_any_vector(in_data(8*(i+1)-1 downto 8*i));
     end loop;
     crc := x"AA55";
     result := bit_reorder & crc;
