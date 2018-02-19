@@ -1,7 +1,58 @@
-# FPGA USB-joystick attemp
+# FPGA USB-joystick attempt
+
+The minimalistic USB-host driver for USB HID device (joystick)
+connected with D+/D- to only 2 ordinary pins of FPGA over 27 ohm
+resistors and 3.6V Zener diodes on ULX3S board.
+
+Started from joystick FPGA USB host driver from 
+[CoreAmstrad](https://github.com/renaudhelias/CoreAmstrad).
+and made driver for Saitek Cyborg joystick by modifying
+USB_logitech.vhd
+
+Joystick works but has latency. From pressing joystick buttons to signal response
+there is some short but annying delay of 100-200 ms. On PC the same
+joystick works with unnoticeable delay.
+
+USB_saitek.vhd contains minimal state machine that acts as USB host for
+the joystick. Instead of proper enumeration, it replays constant USB 
+packets to initialize the joystick, receives eventual USB response, 
+ignores it and starts listening to USB HID reports.
+
+Additionally < VHDL package is written with functions that
+reverse bit order and calculate crc5 and crc16, for easier creating 
+VHDL usb packet hex constants.
+
+New HID device may be USB-sniffed with wireshark on linux
+and then file USB_saitek.vhd can be modified to support new device.
+
+    modprobe usbmon
+    chown user:user /dev/usbmon*
+    wireshark
+
+Plug device and push its buttons or replug it few times to find out
+which usbmon device sniffs its traffic, then select
+this usbmon as wireshark capture device.
+
+plug joystick in and find 8-byte data from sniffed "URB setup", source
+"host", e.g.
+
+    80 06 00 01 00 00 12 00
+
+and copy it to the USB constants here as 
+
+    usb_data_gen(C_DATA0 & x"8006000100001200"):
+
+at the end of USB_saitek.vhd file, configure the
+state machine to replay all packets in the sniffed order
+to the joystick. Eventually some packets will not work
+so experiment a bit.
+
+# Additional info from original author
 
 some info on it
 http://www.cpcwiki.eu/index.php/FPGAmstrad#USB_joystick
+
+Part of original wiki:
 
 USB joystick
 
