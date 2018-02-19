@@ -1,26 +1,23 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_1164.ALL;
 use IEEE.std_logic_arith.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.std_logic_unsigned.ALL;
 
-use work.usb_req_gen_func_pack.all;
+use work.usb_req_gen_func_pack.ALL;
 
 entity USB_saitek is
-    Port ( CLK7_5MHz : in  STD_LOGIC;
-	 -- 60MHz=50*6/5 MHz -- 60/5=12 MHz
-	--7.5MHz=50*6/40MHz --7.5/5=1.5MHz
-           USB_DATA : inout  STD_LOGIC_VECTOR (1 downto 0);
-			  PLAGE:in std_logic_vector(2 downto 0):=(others=>'0');
-			  joystick_left:out std_logic;
-			  joystick_right:out std_logic;
-			  joystick_up:out std_logic;
-			  joystick_down:out std_logic;
-			  joystick_button1:out std_logic;
-			  joystick_button2:out std_logic;
-			  joystick_button3:out std_logic;
-			  joystick_button4:out std_logic;
-           LEDS : out  STD_LOGIC_VECTOR (7 downto 0));
-end USB_saitek;
+Generic
+(
+  REPORT_LEN : integer := 8 -- bytes report len
+);
+Port
+(
+  CLK7_5MHz  : in    std_logic; -- 7.5 MHz clock
+  USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D-
+  HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
+  LEDS       : out   std_logic_vector(7 downto 0)
+);
+end;
 
 architecture Behavioral of USB_saitek is
 
@@ -92,19 +89,19 @@ constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- 
 -- find 8-byte data from sniffed "URB setup" source host
 -- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"80_06_00_01_00_00_12_00":
 -- and at the end of this file, modify state machine to replay those packets to the joystick
-constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_000100004000");
-constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2303040001000000");
-constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A300000001000400");
-constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2301140001000000");
-constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000100001200");
-constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200000900");
-constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200002900");
-constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"800600030000FF00");
-constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"800601030904FF00");
-constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"800602030904FF00");
-constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"0009010000000000");
-constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"210A000000000000");
-constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8106002200007702");
+constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_40_00");
+constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_03_04_00_01_00_00_00");
+constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A3_00_00_00_01_00_04_00");
+constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_01_14_00_01_00_00_00");
+constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00");
+constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_09_00");
+constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_29_00");
+constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_03_00_00_FF_00");
+constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_01_03_09_04_FF_00");
+constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_02_03_09_04_FF_00");
+constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"00_09_01_00_00_00_00_00");
+constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_0A_00_00_00_00_00_00");
+constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_77_02");
 --
 
 constant OUT_OUT:std_logic_vector(7 downto 0):="10000111";
@@ -133,7 +130,7 @@ constant DEMI_PAS:integer:=2;--5/2;
 
 constant TIME_OUT:integer:=8; -- 7.5bit
 
-constant REPORT_LEN:integer:=9; -- bytes report length
+-- constant REPORT_LEN:integer:=9; -- bytes report length
 
 signal step_ps3_test:integer range 0 to 11:=0;
 
@@ -167,7 +164,7 @@ process(CLK7_5MHz) is
 	begin
 		crc5_value:=(others=>'1');
 	end procedure;
-	subtype crc5_result is STD_LOGIC_VECTOR(4 downto 0);
+	subtype crc5_result is std_logic_vector(4 downto 0);
 	function crc5(d:std_logic;crc5:std_logic_vector(4 downto 0)) return crc5_result is
 		variable a:std_logic;
 		variable b:std_logic;
@@ -188,7 +185,7 @@ process(CLK7_5MHz) is
 	begin
 		crc16_value:=(others=>'1');
 	end procedure;
-	subtype crc16_result is STD_LOGIC_VECTOR(15 downto 0);
+	subtype crc16_result is std_logic_vector(15 downto 0);
 	function crc16(d:std_logic;crc16:std_logic_vector(15 downto 0)) return crc16_result is
 		variable a:std_logic;
 		variable b:std_logic;
@@ -315,26 +312,25 @@ process(CLK7_5MHz) is
 
 	variable interval:std_logic_vector(7 downto 0):=(others=>'0');
 	
-	variable joystick_left_mem:std_logic:='0';
-	variable joystick_right_mem:std_logic:='0';
-	variable joystick_up_mem:std_logic:='0';
-	variable joystick_down_mem:std_logic:='0';
-	variable joystick_button1_mem:std_logic:='0';
-	variable joystick_button2_mem:std_logic:='0';
-	variable joystick_button3_mem:std_logic:='0';
-	variable joystick_button4_mem:std_logic:='0';
+--	variable joystick_left_mem:std_logic:='0';
+--	variable joystick_right_mem:std_logic:='0';
+--	variable joystick_up_mem:std_logic:='0';
+--	variable joystick_down_mem:std_logic:='0';
+--	variable joystick_button1_mem:std_logic:='0';
+--	variable joystick_button2_mem:std_logic:='0';
+--	variable joystick_button3_mem:std_logic:='0';
+--	variable joystick_button4_mem:std_logic:='0';
 	
 	
 	
 begin
 step_ps3_test<=step_ps3;
+HID_REPORT <= reverse_any_vector(JOY_mem);
 if rising_edge(CLK7_5MHz) then
-
 	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
 	for i in 4 to 7 loop
-	  --LEDS(i)<=JOY_mem(i + 8*conv_integer(PLAGE));
 	  LEDS(i)<= JOY_mem(i + 8*0)
 	        xor JOY_mem(i + 8*1)
 	        xor JOY_mem(i + 8*2)
@@ -345,15 +341,6 @@ if rising_edge(CLK7_5MHz) then
 	        xor JOY_mem(i + 8*7);
 	end loop;
 
-	joystick_left<=joystick_left_mem;
-	joystick_right<=joystick_right_mem;
-	joystick_up<=joystick_up_mem;
-	joystick_down<=joystick_down_mem;
-	joystick_button1<=joystick_button1_mem;
-	joystick_button2<=joystick_button2_mem;
-	joystick_button3<=joystick_button3_mem;
-	joystick_button4<=joystick_button4_mem;
-	
 	if zap then
 		if counter_PAS=DEMI_PAS then
 			if mode_receive then
@@ -1311,39 +1298,6 @@ crc5_value:=(others=>'0');
 									step_ps3:=40; -- envoyer un NACK
 								else
 									JOY_mem:=JOY_CANDIDATE_mem;
-
-									joystick_left_mem:='0';
-									joystick_right_mem:='0';
-									joystick_up_mem:='0';
-									joystick_down_mem:='0';
-									joystick_button1_mem:=JOY_CANDIDATE_mem(3*8+3);
-									joystick_button2_mem:=JOY_CANDIDATE_mem(3*8+2);
-									joystick_button3_mem:=JOY_CANDIDATE_mem(3*8+1);
-									joystick_button4_mem:=JOY_CANDIDATE_mem(3*8);
-									
-									case JOY_CANDIDATE_mem(3*8+7 downto 3*8+4) is
-										when "0000"=>
-											joystick_up_mem:='1';
-										when "1000"=>
-											joystick_up_mem:='1';
-											joystick_right_mem:='1';
-										when "0100"=>
-											joystick_right_mem:='1';
-										when "1100"=>
-											joystick_right_mem:='1';
-											joystick_down_mem:='1';
-										when "0010"=>
-											joystick_down_mem:='1';
-										when "1010"=>
-											joystick_down_mem:='1';
-											joystick_left_mem:='1';
-										when "0110"=>
-											joystick_left_mem:='1';
-										when "1110"=>
-											joystick_left_mem:='1';
-											joystick_up_mem:='1';
-										when others=>
-									end case;
 								end if;
 							end if;
 					else
@@ -1467,13 +1421,16 @@ if next_cmd then
 			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
 			step_cmd<=1;
 		when 1=>
-			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
+--			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
 			step_cmd<=2;
 		when 2=>
-			trame_read(C_ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
+--			trame_read(C_ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
 			step_cmd<=3;
 		when 3=>
-			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
+--			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
 			step_cmd<=4;
 		when 4=>
 			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
@@ -1497,7 +1454,7 @@ if next_cmd then
 			trame_set(C_ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 			step_cmd<=11;
 		when 11=>
-			trame_set(C_ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 --			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
 			step_cmd<=12;
 		when 12=>
