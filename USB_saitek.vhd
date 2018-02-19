@@ -1464,16 +1464,13 @@ if next_cmd then
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
 			step_cmd<=1;
 		when 1=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
-			--trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
+			trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
 			step_cmd<=2;
 		when 2=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
-			--trame_read(ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
+			trame_read(ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
 			step_cmd<=3;
 		when 3=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
-			--trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
+			trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
 			step_cmd<=4;
 		when 4=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
@@ -1488,10 +1485,10 @@ if next_cmd then
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 			step_cmd<=8;
 		when 8=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=9;
 		when 9=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
 			step_cmd<=10;
 		when 10=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
