@@ -51,6 +51,24 @@ response there is some short but annying delay of 100-200 ms), try
 reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
 in "USB_saitek.vhd".
 
+# Troubleshooting
+
+Around line 330 in "USB_saitek.vhd" is on the lower 4 bits is
+shown state of the packet replay machine. Keep the joystick plugged in
+and upload the bitstream over jtag. In a second the states should
+advance from 0 to the final state (13 in saitek case). It it stops
+halfway and final state is not reached, joystick for sure won't work so try 
+to disable or change some packet being send.
+
+When final state is reached, pressing joystick buttons should blink
+some lights in upper 4 LED bits. Check that pressing of the buttons
+drives LED without any noticeable delay, adjust bInterval and play it
+longer time to check it works reliable.
+
+If joystick is unplugging and pluged back, it will not contine working
+until FPGA bitstream is reloaded. State machine could be improved
+to fix that.
+
 # Additional info from original source
 
 some info on it
