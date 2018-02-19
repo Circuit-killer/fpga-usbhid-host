@@ -1,8 +1,10 @@
 # FPGA USB-HID host
 
-The minimalistic USB-host driver for USB HID device (joystick)
-connected on D+/D- any 2 pins of FPGA over 27 ohm
-resistors and 3.6V Zener diodes. Tested on ULX3S board.
+The minimalistic USB-host driver for USB HID devices. USB low speed device
+(joystick) is connected with its D+/D- lines to any 2 general purpose pins of FPGA
+over 27 ohm series resistors and 3.6V voltage limitation Zener diodes. 
+Tested and works on ULX3S board. FPGA internal pulldown is enabled on both
+lines. This is not exactly 15k by the standard but seems to work for me.
 
 Started from joystick FPGA USB host driver from 
 [CoreAmstrad](https://github.com/renaudhelias/CoreAmstrad).
