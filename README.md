@@ -31,8 +31,8 @@ Plug device and push its buttons or replug it few times to find out
 which usbmon device sniffs its traffic, then select
 this usbmon as wireshark capture device.
 
-plug joystick in and find 8-byte data from sniffed "URB setup", source
-"host", e.g.
+plug joystick in and find 8-byte data from sniffed from source "host".
+Click on "URB setup", 8-byte data will be hightlighted:
 
     80 06 00 01 00 00 12 00
 
