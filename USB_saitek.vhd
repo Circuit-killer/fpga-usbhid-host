@@ -28,7 +28,7 @@ constant UN:std_logic_vector(1 downto 0):="01"; --lowspeed
 constant ZERO:std_logic_vector(1 downto 0):="10"; --lowspeed
 constant EOP:std_logic_vector(1 downto 0):="00";
 constant IDLE:std_logic_vector(1 downto 0):=UN;
-constant bInterval:std_logic_vector(7 downto 0):=x"0A";
+constant bInterval:std_logic_vector(7 downto 0):=x"01";
 
 function bit2data(b:std_logic) return std_logic_vector is
 begin
