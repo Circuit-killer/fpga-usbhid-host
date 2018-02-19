@@ -9,10 +9,6 @@ Started from joystick FPGA USB host driver from
 and made driver for Saitek Cyborg joystick by modifying
 USB_logitech.vhd
 
-Joystick works but has latency. From pressing joystick buttons to signal
-response there is some short but annying delay of 100-200 ms. On PC the same
-joystick works without any noticeable delay.
-
 "USB_saitek.vhd" contains minimal state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
 packets to initialize the joystick, receives eventual USB response, 
@@ -46,6 +42,11 @@ at the end of "USB_saitek.vhd" file, configure the
 state machine to replay all packets in the sniffed order
 to the joystick. Eventually some packets will not work
 so experiment a bit.
+
+If joystick works but has latency (from pressing joystick buttons to signal
+response there is some short but annying delay of 100-200 ms), try 
+reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
+in "USB_saitek.vhd").
 
 # Additional info from original source
 
