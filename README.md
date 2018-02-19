@@ -47,7 +47,7 @@ state machine to replay all packets in the sniffed order
 to the joystick. Eventually some packets will not work
 so experiment a bit.
 
-# Additional info from original author
+# Additional info from original source
 
 some info on it
 http://www.cpcwiki.eu/index.php/FPGAmstrad#USB_joystick
