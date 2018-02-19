@@ -53,21 +53,23 @@ in "USB_saitek.vhd".
 
 # Troubleshooting
 
-Around line 330 in "USB_saitek.vhd" is on the lower 4 bits is
-shown state of the packet replay machine. Keep the joystick plugged in
-and upload the bitstream over jtag. In a second the states should
-advance from 0 to the final state (13 in saitek case). It it stops
-halfway and final state is not reached, joystick for sure won't work so try 
-to disable or change some packet being send.
+Around line 330 in "USB_saitek.vhd" is some LED debug logic. 
+On Lower 4 LED bits is shown state of the packet replay machine.
+Keep the joystick plugged in, upload the bitstream over jtag and
+watch lower 4 LEDs.
+
+In a second the states should advance from 0 to the final state 
+(13d=1101b for saitek). It it stops halfway and final state is not
+reached, joystick won't work so try to disable or change some packet
+being send before that.
 
 When final state is reached, pressing joystick buttons should blink
 some lights in upper 4 LED bits. Check that pressing of the buttons
 drives LED without any noticeable delay, adjust bInterval and play it
 longer time to check it works reliable.
 
-If joystick is unplugging and pluged back, it will not contine working
-until FPGA bitstream is reloaded. State machine could be improved
-to fix that.
+If joystick is re-plugged, it will stop working until FPGA bitstream 
+is reloaded. State machine could be improved for user convenience.
 
 # Additional info from original source
 
