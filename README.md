@@ -11,7 +11,7 @@ Started from joystick FPGA USB host driver from
 and made driver for Saitek Cyborg joystick by modifying
 original file "USB_logitech.vhd"
 
-"USB_saitek.vhd" contains minimal state machine that acts as USB host for
+"USB_saitek.vhd" contains "minimal" state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
 packets to initialize the joystick, receives eventual USB response, 
 ignores it and starts listening to USB HID reports.
