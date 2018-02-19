@@ -46,7 +46,7 @@ so experiment a bit.
 If joystick works but has latency (from pressing joystick buttons to signal
 response there is some short but annying delay of 100-200 ms), try 
 reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
-in "USB_saitek.vhd").
+in "USB_saitek.vhd".
 
 # Additional info from original source
 
