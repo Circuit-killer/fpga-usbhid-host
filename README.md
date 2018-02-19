@@ -66,7 +66,7 @@ being send before that.
 When final state is reached, pressing joystick buttons should blink
 some lights in upper 4 LED bits. Check that pressing of the buttons
 drives LED without any noticeable delay, adjust bInterval and play it
-longer time to check it works reliable.
+longer time to make sure it works reliable.
 
 If joystick is re-plugged, it will stop working until FPGA bitstream 
 is reloaded. State machine could be improved for user convenience.
