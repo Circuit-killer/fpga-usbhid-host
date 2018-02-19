@@ -58,23 +58,30 @@ constant DATA1:std_logic_vector(7 downto 0):="11010010";
 constant DATA0:std_logic_vector(7 downto 0):="11000011";
 constant SETUP:std_logic_vector(7 downto 0):="10110100";
 
-constant ADDR0_ENDP0:std_logic_vector(11+5-1 downto 0):="00000000000" & "01000";
-constant ADDR1_ENDP0:std_logic_vector(11+5-1 downto 0):="10000000000" & "10111";
-constant ADDR1_ENDP1:std_logic_vector(11+5-1 downto 0):="10000001000" & "11010";
 
-constant GET_DESCRIPTOR_DEVICE_40h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"10000000" & "00000000"&"00000000" & "00000010"&"00000000" & "1011101100101001";
-constant SET_ADDRESS_1		     :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000000" & "10100000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1101011110100100";
-constant GET_DESCRIPTOR_DEVICE_12h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"10000000" & "00000000"&"00000000" & "01001000"&"00000000" & "0000011100101111";
-constant GET_DESCRIPTOR_CONFIG_FFh   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "11111111"&"00000000" & "1001011100100101";
-constant GET_DESCRIPTOR_STRING_0_FFh :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"11000000" & "00000000"&"00000000" & "11111111"&"00000000" & "0010101100100110";
-constant GET_DESCRIPTOR_STRING_2_FFh :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "01000000"&"11000000" & "10010000"&"00100000" & "11111111"&"00000000" & "1110100111011011";
-constant GET_DESCRIPTOR_CONFIG_09h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "10010000"&"00000000" & "0111010100100000";
-constant GET_DESCRIPTOR_CONFIG_29h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "10010100"&"00000000" & "1110110100100011";
-constant SET_CONFIGURATION_1	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000000" & "10010000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1110010010100100";
-constant GET_INTERFACE_0	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000100" & "01010000" & "00000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "0110101100000100";
-constant GET_DESCRIPTOR_REPORT_B7h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000001" & "01100000" & "00000000"&"01000100" & "00000000"&"00000000" & "11101101"&"00000000" & "1111100111110101";
+-- old constants with already calculated supplied CRC,
+-- good as examples for checking if CRC functions works correctly
+--constant ADDR0_ENDP0:std_logic_vector(11+5-1 downto 0):="00000000000" & "01000";
+--constant ADDR1_ENDP0:std_logic_vector(11+5-1 downto 0):="10000000000" & "10111";
+--constant ADDR1_ENDP1:std_logic_vector(11+5-1 downto 0):="10000001000" & "11010";
+--constant GET_DESCRIPTOR_DEVICE_40h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"10000000" & "00000000"&"00000000" & "00000010"&"00000000" & "1011101100101001";
+--constant SET_ADDRESS_1		     :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000000" & "10100000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1101011110100100";
+--constant GET_DESCRIPTOR_DEVICE_12h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"10000000" & "00000000"&"00000000" & "01001000"&"00000000" & "0000011100101111";
+--constant GET_DESCRIPTOR_CONFIG_FFh   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "11111111"&"00000000" & "1001011100100101";
+--constant GET_DESCRIPTOR_STRING_0_FFh :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"11000000" & "00000000"&"00000000" & "11111111"&"00000000" & "0010101100100110";
+--constant GET_DESCRIPTOR_STRING_2_FFh :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "01000000"&"11000000" & "10010000"&"00100000" & "11111111"&"00000000" & "1110100111011011";
+--constant GET_DESCRIPTOR_CONFIG_09h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "10010000"&"00000000" & "0111010100100000";
+--constant GET_DESCRIPTOR_CONFIG_29h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000001" & "01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "10010100"&"00000000" & "1110110100100011";
+--constant SET_CONFIGURATION_1	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "00000000" & "10010000" & "10000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "1110010010100100";
+--constant GET_INTERFACE_0	     :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000100" & "01010000" & "00000000"&"00000000" & "00000000"&"00000000" & "00000000"&"00000000" & "0110101100000100";
+--constant GET_DESCRIPTOR_REPORT_B7h   :std_logic_vector(11*8-1 downto 0):=DATA0 & "10000001" & "01100000" & "00000000"&"01000100" & "00000000"&"00000000" & "11101101"&"00000000" & "1111100111110101";
 
--- saitek cyborg joystick constants using packet generator function
+-- saitek cyborg joystick constants using packet generator function that
+-- automatically appends CRC
+constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
+constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
+constant C_ADDR1_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000001");
+constant C_ADDR1_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000001");
 constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- DATA0 is reversed bit order
 -- modprobe usbmon
 -- chown user:user /dev/usbmon*
@@ -83,9 +90,9 @@ constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- 
 -- to find out which usbmon device receives its traffic, then select it to capture
 -- plug joystick in
 -- find 8-byte data from sniffed "URB setup" source host
--- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"8006000100001200":
--- and at the end of this file, configure state machine to replay all packets to the joystick
-constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000100004000");
+-- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"80_06_00_01_00_00_12_00":
+-- and at the end of this file, modify state machine to replay those packets to the joystick
+constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_000100004000");
 constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2303040001000000");
 constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A300000001000400");
 constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2301140001000000");
@@ -98,10 +105,6 @@ constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb
 constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"0009010000000000");
 constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"210A000000000000");
 constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8106002200007702");
-constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
-constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
-constant C_ADDR1_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000001");
-constant C_ADDR1_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000001");
 --
 
 constant OUT_OUT:std_logic_vector(7 downto 0):="10000111";
@@ -274,10 +277,10 @@ process(CLK7_5MHz) is
 	end procedure;
 
 
-	variable TRAME_GET_SETUP:std_logic_vector(8+11+5-1 downto 0):=SETUP & ADDR0_ENDP0;
-	variable TRAME_GET_DATA0:std_logic_vector(11*8-1 downto 0):=GET_DESCRIPTOR_DEVICE_40h;
-	variable IN_ADDR_ENDP:std_logic_vector(8+11+5-1 downto 0):=IN_IN & ADDR0_ENDP0;
-	variable OUT_ADDR_ENDP:std_logic_vector(8+11+5-1 downto 0):=OUT_OUT & ADDR1_ENDP1;
+	variable TRAME_GET_SETUP:std_logic_vector(8+11+5-1 downto 0):=SETUP & C_ADDR0_ENDP0;
+	variable TRAME_GET_DATA0:std_logic_vector(11*8-1 downto 0):=C_GET_DESCRIPTOR_DEVICE_40h;
+	variable IN_ADDR_ENDP:std_logic_vector(8+11+5-1 downto 0):=IN_IN & C_ADDR0_ENDP0;
+	variable OUT_ADDR_ENDP:std_logic_vector(8+11+5-1 downto 0):=OUT_OUT & C_ADDR1_ENDP1;
 	variable TRAME_OUT_DATA1:std_logic_vector(3*8-1 downto 0):=OUT_DATA1;
 	variable TRAME_OUT_DATA1_length:integer range 0 to TRAME_OUT_DATA1'length:=0;
 	procedure trame_read(ADDR_ENDP:std_logic_vector(11+5-1 downto 0); DATA:std_logic_vector(11*8-1 downto 0)) is
@@ -293,8 +296,8 @@ process(CLK7_5MHz) is
 	end procedure;
 	
 
-	variable TRAME_SET_SETUP:std_logic_vector(8+11+5-1 downto 0):=SETUP & ADDR0_ENDP0;
-	variable TRAME_SET_DATA0:std_logic_vector(11*8-1 downto 0):=SET_ADDRESS_1;
+	variable TRAME_SET_SETUP:std_logic_vector(8+11+5-1 downto 0):=SETUP & C_ADDR0_ENDP0;
+	variable TRAME_SET_DATA0:std_logic_vector(11*8-1 downto 0):=C_SET_CONFIGURATION_1;
 	procedure trame_set(ADDR_ENDP:std_logic_vector(11+5-1 downto 0); DATA:std_logic_vector(11*8-1 downto 0)) is
 	begin
 		TRAME_SET_SETUP:=SETUP & ADDR_ENDP;
@@ -1461,44 +1464,44 @@ if next_cmd then
 	next_cmd:=false;
 	case (step_cmd) is
 		when 0=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
 			step_cmd<=1;
 		when 1=>
-			trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
+			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
 			step_cmd<=2;
 		when 2=>
-			trame_read(ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
+			trame_read(C_ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
 			step_cmd<=3;
 		when 3=>
-			trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
+			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
 			step_cmd<=4;
 		when 4=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
 			step_cmd<=5;
 		when 5=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
 			step_cmd<=6;
 		when 6=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
 			step_cmd<=7;
 		when 7=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 			step_cmd<=8;
 		when 8=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=9;
 		when 9=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
 			step_cmd<=10;
 		when 10=>
-			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_set(C_ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 			step_cmd<=11;
 		when 11=>
-			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_set(C_ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
 --			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
 			step_cmd<=12;
 		when 12=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
+			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
 			step_cmd<=13;
 		when others =>
 			plug(C_ADDR0_ENDP1);
