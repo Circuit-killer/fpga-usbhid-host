@@ -11,7 +11,7 @@ USB_logitech.vhd
 
 Joystick works but has latency. From pressing joystick buttons to signal
 response there is some short but annying delay of 100-200 ms. On PC the same
-joystick works with unnoticeable delay.
+joystick works without any noticeable delay.
 
 "USB_saitek.vhd" contains minimal state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
