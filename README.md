@@ -7,7 +7,7 @@ resistors and 3.6V Zener diodes. Tested on ULX3S board.
 Started from joystick FPGA USB host driver from 
 [CoreAmstrad](https://github.com/renaudhelias/CoreAmstrad).
 and made driver for Saitek Cyborg joystick by modifying
-USB_logitech.vhd
+original file "USB_logitech.vhd"
 
 "USB_saitek.vhd" contains minimal state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
