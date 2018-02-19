@@ -36,7 +36,8 @@ Click on "URB setup", 8-byte data will be hightlighted:
 
     80 06 00 01 00 00 12 00
 
-and copy it to the USB constants in "USB_saitek.vhd" like this:
+and copy it to the USB constants in "USB_saitek.vhd" giving them
+any comprehensive name like this:
 
     constant C_GET_DESCRIPTOR_DEVICE_12h: std_logic_vector(11*8-1 downto 0) :=
       usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00"):
