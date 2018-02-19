@@ -1,4 +1,4 @@
-# FPGA USB-joystick attempt
+# FPGA USBHID host
 
 The minimalistic USB-host driver for USB HID device (joystick)
 connected on D+/D- any 2 pins of FPGA over 27 ohm
