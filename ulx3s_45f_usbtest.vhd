@@ -143,41 +143,6 @@ begin
   end process;
   led(7 downto 0) <= R_blinky(R_blinky'high downto R_blinky'high-7);
   end generate;
-  
-  ps3: if false generate
-  usb_ps3_inst: entity USB_ps3
-  port map
-  (
-    clk60MHz => clk_60MHz,
-    plage => "1000",
-    usb_data(0) => usb_fpga_dp,
-    usb_data(1) => usb_fpga_dn,
-    leds => led
-  );
-  end generate;
-
-  snifer: if false generate
-  usb_snifer_inst: entity USB_snifer
-  port map
-  (
-    clk => clk_7M5Hz,
-    usb_data(0) => usb_fpga_dp,
-    usb_data(1) => usb_fpga_dn,
-    leds => led
-  );
-  end generate;
-
-  logitech: if false generate
-  usb_logitech_inst: entity USB_logitech
-  port map
-  (
-    clk7_5MHz => clk_7M5Hz,
-    plage => "100",
-    usb_data(1) => usb_fpga_dp,
-    usb_data(0) => usb_fpga_dn,
-    leds => led
-  );
-  end generate;
 
   saitek: if true generate
   usb_saitek_inst: entity USB_saitek
