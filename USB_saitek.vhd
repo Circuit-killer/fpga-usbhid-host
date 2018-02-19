@@ -86,6 +86,9 @@ constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- 
 -- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"8006000100001200":
 -- and at the end of this file, configure state machine to replay all packets to the joystick
 constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000100004000");
+constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2303040001000000");
+constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A300000001000400");
+constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"2301140001000000");
 constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000100001200");
 constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200000900");
 constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"8006000200002900");
@@ -131,13 +134,12 @@ constant REPORT_LEN:integer:=9; -- bytes report length
 
 signal step_ps3_test:integer range 0 to 11:=0;
 
-signal step_cmd: integer range 0 to 12 := 0;
+signal step_cmd: integer range 0 to 15 := 0;
 
 begin
 
 process(CLK7_5MHz) is
 	variable step_ps3:integer range 0 to 41:=0;
-	-- variable step_cmd:integer range 0 to 12:=0;
 	variable next_cmd:boolean:=false;
 	variable counter_RESET:integer range 0 to period_RESET*PAS:=0;
 	variable counter_IDLE:integer range 0 to period_IDLE+period_EOP:=0;
@@ -1463,38 +1465,44 @@ if next_cmd then
 			step_cmd<=1;
 		when 1=>
 			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			--trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
 			step_cmd<=2;
 		when 2=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			--trame_read(ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
 			step_cmd<=3;
 		when 3=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
+			--trame_set(ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
 			step_cmd<=4;
 		when 4=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
 			step_cmd<=5;
 		when 5=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
 			step_cmd<=6;
 		when 6=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
 			step_cmd<=7;
 		when 7=>
-			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
 			step_cmd<=8;
 		when 8=>
-			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
 			step_cmd<=9;
 		when 9=>
-			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
 			step_cmd<=10;
 		when 10=>
 			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
---			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
 			step_cmd<=11;
 		when 11=>
-			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
+			trame_set(ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
+--			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
 			step_cmd<=12;
+		when 12=>
+			trame_read(ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
+			step_cmd<=13;
 		when others =>
 			plug(C_ADDR0_ENDP1);
 	end case;
