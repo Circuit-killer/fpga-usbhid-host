@@ -13,6 +13,7 @@ Generic
 Port
 (
   CLK7_5MHz  : in    std_logic; -- 7.5 MHz clock
+  reset      : in    std_logic := '0'; -- async reset
   USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D-
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
   LEDS       : out   std_logic_vector(7 downto 0)
@@ -130,10 +131,7 @@ constant DEMI_PAS:integer:=2;--5/2;
 
 constant TIME_OUT:integer:=8; -- 7.5bit
 
--- constant REPORT_LEN:integer:=9; -- bytes report length
-
 signal step_ps3_test:integer range 0 to 11:=0;
-
 signal step_cmd: integer range 0 to 15 := 0;
 
 begin
@@ -330,6 +328,7 @@ if rising_edge(CLK7_5MHz) then
 	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
+        button_blink: if true then
 	for i in 4 to 7 loop
 	  LEDS(i)<= JOY_mem(i + 8*0)
 	        xor JOY_mem(i + 8*1)
@@ -340,6 +339,7 @@ if rising_edge(CLK7_5MHz) then
 	        xor JOY_mem(i + 8*6)
 	        xor JOY_mem(i + 8*7);
 	end loop;
+	end if;
 
 	if zap then
 		if counter_PAS=DEMI_PAS then
@@ -1463,6 +1463,11 @@ if next_cmd then
 		when others =>
 			plug(C_ADDR0_ENDP1);
 	end case;
+else
+  if reset='1' then
+    step_cmd <= 0;
+    step_ps3 := 0;
+  end if;
 end if;
 
 		

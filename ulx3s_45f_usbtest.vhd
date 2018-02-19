@@ -114,6 +114,7 @@ architecture Behavioral of ulx3s_usbtest is
   constant C_GET_DESCRIPTOR_REPORT_B7h : std_logic_vector(9*8-1 downto 0) := reverse_any_vector(DATA0) & x"810600220000B700";
   constant C_ADDR1_ENDP1 : std_logic_vector(10 downto 0) := "00010000001";
   -----8<----- cut here -----8<-----  
+  signal S_reset: std_logic;
   
   signal S_hid_report: std_logic_vector(63 downto 0);
   alias S_left_stick_x: std_logic_vector(7 downto 0) is S_hid_report(15 downto 8);
@@ -159,6 +160,7 @@ begin
 
   wifi_en <= '1';
   wifi_gpio0 <= btn(0);
+  S_reset <= not btn(0);
 
   -- clock alive blinky
   blink: if false generate
@@ -175,10 +177,11 @@ begin
   port map
   (
     clk7_5MHz => clk_7M5Hz,
+    reset => S_reset,
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
-    leds => open
+    leds => open -- debug
   );
 
   -- hat decoder  
@@ -192,10 +195,10 @@ begin
                 "1010" when S_hat = "0111" else -- up+left
                 "0000";          -- "1111" when not pressed
 
+  led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
   -- led <= S_btn_a & S_btn_b & S_btn_x & S_btn_y & S_btn_left_bumper & S_btn_right_bumper & S_btn_left_trigger & S_btn_right_trigger;
   -- led <= "00" & S_btn_back & S_btn_start & S_btn_left_pad & S_btn_right_pad & S_btn_fps & S_btn_fps_toggle;
-  -- led(3 downto 0) <= S_hat_up & S_hat_down & S_hat_left & S_hat_right;
-  led(5 downto 0) <= S_analog_trigger;
+  -- led(5 downto 0) <= S_analog_trigger;
 
   -- small test suite for usb packet generator
   -- led <= reverse_any_vector(x"07");
