@@ -1,29 +1,29 @@
 # FPGA USB-joystick attempt
 
 The minimalistic USB-host driver for USB HID device (joystick)
-connected with D+/D- to only 2 ordinary pins of FPGA over 27 ohm
-resistors and 3.6V Zener diodes on ULX3S board.
+connected on D+/D- any 2 pins of FPGA over 27 ohm
+resistors and 3.6V Zener diodes. Tested on ULX3S board.
 
 Started from joystick FPGA USB host driver from 
 [CoreAmstrad](https://github.com/renaudhelias/CoreAmstrad).
 and made driver for Saitek Cyborg joystick by modifying
 USB_logitech.vhd
 
-Joystick works but has latency. From pressing joystick buttons to signal response
-there is some short but annying delay of 100-200 ms. On PC the same
+Joystick works but has latency. From pressing joystick buttons to signal
+response there is some short but annying delay of 100-200 ms. On PC the same
 joystick works with unnoticeable delay.
 
-USB_saitek.vhd contains minimal state machine that acts as USB host for
+"USB_saitek.vhd" contains minimal state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
 packets to initialize the joystick, receives eventual USB response, 
 ignores it and starts listening to USB HID reports.
 
-Additionally < VHDL package is written with functions that
+Additionally a VHDL package "usb_req_gen_func_pack.vhd" is written with functions that
 reverse bit order and calculate crc5 and crc16, for easier creating 
 VHDL usb packet hex constants.
 
 New HID device may be USB-sniffed with wireshark on linux
-and then file USB_saitek.vhd can be modified to support new device.
+and then file "USB_saitek.vhd" can be modified to support new device.
 
     modprobe usbmon
     chown user:user /dev/usbmon*
@@ -42,7 +42,7 @@ and copy it to the USB constants here as
 
     usb_data_gen(C_DATA0 & x"8006000100001200"):
 
-at the end of USB_saitek.vhd file, configure the
+at the end of "USB_saitek.vhd" file, configure the
 state machine to replay all packets in the sniffed order
 to the joystick. Eventually some packets will not work
 so experiment a bit.
