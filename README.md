@@ -59,7 +59,7 @@ Keep the joystick plugged in, upload the bitstream over jtag and
 watch lower 4 LEDs.
 
 In a second, machine states should advance from 0d=0000b to the final state 
-13d=1101b for this example. It it stops halfway and final state is not
+13d=1101b for this example. If it stops halfway and final state is not
 reached, joystick won't work so try to disable or change some packet
 being send before that.
 
