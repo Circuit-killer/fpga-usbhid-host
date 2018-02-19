@@ -36,14 +36,14 @@ plug joystick in and find 8-byte data from sniffed "URB setup", source
 
     80 06 00 01 00 00 12 00
 
-and copy it to the USB constants here as 
+and copy it to the USB constants in "USB_saitek.vhd" like this:
 
-    usb_data_gen(C_DATA0 & x"8006000100001200"):
+    constant C_GET_DESCRIPTOR_DEVICE_12h: std_logic_vector(11*8-1 downto 0) :=
+      usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00"):
 
-at the end of "USB_saitek.vhd" file, configure the
-state machine to replay all packets in the sniffed order
-to the joystick. Eventually some packets will not work
-so experiment a bit.
+At the end of "USB_saitek.vhd" file, modify the state machine 
+to replay the constants to the joystick in the order of appearance as sniffed.
+Eventually some packets will not work so experiment a bit.
 
 If joystick works but has latency (from pressing joystick buttons to signal
 response there is some short but annying delay of 100-200 ms), try 
