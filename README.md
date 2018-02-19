@@ -46,11 +46,6 @@ At the end of "USB_saitek.vhd" file, modify the state machine
 to replay the constants to the joystick in the order of appearance as sniffed.
 Eventually some packets will not work so experiment a bit.
 
-If joystick works but has latency (from pressing joystick buttons to signal
-response there is some short but annying delay of 100-200 ms), try 
-reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
-in "USB_saitek.vhd".
-
 # Troubleshooting
 
 Around line 330 in "USB_saitek.vhd" is some LED debug logic. 
@@ -65,8 +60,12 @@ being send before that.
 
 When final state is reached, pressing joystick buttons should blink
 some lights in upper 4 LED bits. Check that pressing of the buttons
-drives LED without any noticeable delay, adjust bInterval and play it
-longer time to make sure it works reliable.
+drives LED without any noticeable delay.
+
+If joystick works but has latency (from pressing joystick buttons to signal
+response there is some short but annying delay of 100-200 ms), try 
+reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
+in "USB_saitek.vhd".
 
 If joystick is re-plugged, it will stop working until FPGA bitstream 
 is reloaded. State machine could be improved for user convenience.
