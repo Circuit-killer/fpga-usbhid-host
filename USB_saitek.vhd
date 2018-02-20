@@ -14,7 +14,7 @@ Port
 (
   CLK7_5MHz  : in    std_logic; -- 7.5 MHz clock
   reset      : in    std_logic := '0'; -- async reset
-  USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D-
+  USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D- both pull down 15k
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
   LEDS       : out   std_logic_vector(7 downto 0)
 );
