@@ -6,6 +6,8 @@ over 27 ohm series resistors and 3.6V voltage limitation Zener diodes.
 Tested and works on ULX3S board. FPGA internal pulldown is enabled on both
 lines. This is not exactly 15k by the standard but seems to work for me.
 
+![Schematics](/pic/usbhost.png)
+
 Started from joystick FPGA USB host driver from 
 [CoreAmstrad](https://github.com/renaudhelias/CoreAmstrad).
 and made driver for Saitek Cyborg joystick by modifying
