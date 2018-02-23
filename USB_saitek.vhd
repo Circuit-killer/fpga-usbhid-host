@@ -1467,6 +1467,7 @@ else
   if reset='1' then
     step_cmd <= 0;
     step_ps3 := 0;
+    sof_init;
   end if;
 end if;
 
