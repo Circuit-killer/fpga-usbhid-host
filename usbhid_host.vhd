@@ -3,9 +3,10 @@ use IEEE.std_logic_1164.ALL;
 use IEEE.std_logic_arith.ALL;
 use IEEE.std_logic_unsigned.ALL;
 
-use work.usb_req_gen_func_pack.ALL;
+use work.usb_req_gen_func_pack.ALL; -- we need reverse_any_vector()
+use work.hid_enum_pack.ALL;
 
-entity USB_saitek is
+entity usbhid_host is
 Generic
 (
   REPORT_LEN : integer := 8 -- bytes report len
@@ -20,13 +21,13 @@ Port
 );
 end;
 
-architecture Behavioral of USB_saitek is
+architecture Behavioral of usbhid_host is
 
 constant UN:std_logic_vector(1 downto 0):="01"; --lowspeed
 constant ZERO:std_logic_vector(1 downto 0):="10"; --lowspeed
 constant EOP:std_logic_vector(1 downto 0):="00";
 constant IDLE:std_logic_vector(1 downto 0):=UN;
-constant bInterval:std_logic_vector(7 downto 0):=x"01";
+-- constant bInterval:std_logic_vector(7 downto 0):=x"01"; -- defined in usb enum package
 
 function bit2data(b:std_logic) return std_logic_vector is
 begin
@@ -56,7 +57,6 @@ constant DATA1:std_logic_vector(7 downto 0):="11010010";
 constant DATA0:std_logic_vector(7 downto 0):="11000011";
 constant SETUP:std_logic_vector(7 downto 0):="10110100";
 
-
 -- old constants with already calculated supplied CRC,
 -- good as examples for checking if CRC functions works correctly
 --constant ADDR0_ENDP0:std_logic_vector(11+5-1 downto 0):="00000000000" & "01000";
@@ -76,11 +76,13 @@ constant SETUP:std_logic_vector(7 downto 0):="10110100";
 
 -- saitek cyborg joystick constants using packet generator function that
 -- automatically appends CRC
-constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
-constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
-constant C_ADDR1_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000001");
-constant C_ADDR1_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000001");
-constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- DATA0 is reversed bit order
+-- defined in package usb_enum_<device>_pack.vhd
+--constant C_ADDR0_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000000");
+--constant C_ADDR0_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000000");
+--constant C_ADDR1_ENDP0                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00000000001");
+--constant C_ADDR1_ENDP1                : std_logic_vector(11+5-1 downto 0) := usb_token_gen("00010000001");
+--constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- DATA0 is reversed bit order
+
 -- modprobe usbmon
 -- chown user:user /dev/usbmon*
 -- wireshark
@@ -90,26 +92,23 @@ constant C_DATA0: std_logic_vector(7 downto 0) := reverse_any_vector(DATA0); -- 
 -- find 8-byte data from sniffed "URB setup" source host
 -- e.g. 80 06 00 01 00 00 12 00 and copy it here as x"80_06_00_01_00_00_12_00":
 -- and at the end of this file, modify state machine to replay those packets to the joystick
-constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_40_00");
-constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_03_04_00_01_00_00_00");
-constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A3_00_00_00_01_00_04_00");
-constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_01_14_00_01_00_00_00");
-constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00");
-constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_09_00");
-constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_29_00");
-constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_03_00_00_FF_00");
-constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_01_03_09_04_FF_00");
-constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_02_03_09_04_FF_00");
-constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"00_09_01_00_00_00_00_00");
-constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_0A_00_00_00_00_00_00");
-constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_77_02");
+--constant C_GET_DESCRIPTOR_DEVICE_40h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_40_00");
+--constant C_URB_CONTROL_OUT_3_4h       : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_03_04_00_01_00_00_00");
+--constant C_URB_CONTROL_IN_4h          : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"A3_00_00_00_01_00_04_00");
+--constant C_URB_CONTROL_OUT_1_14h      : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"23_01_14_00_01_00_00_00");
+--constant C_GET_DESCRIPTOR_DEVICE_12h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00");
+--constant C_GET_DESCRIPTOR_CONFIG_09h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_09_00");
+--constant C_GET_DESCRIPTOR_CONFIG_29h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_02_00_00_29_00");
+--constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_00_03_00_00_FF_00");
+--constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_01_03_09_04_FF_00");
+--constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_02_03_09_04_FF_00");
+--constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"00_09_01_00_00_00_00_00");
+--constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_0A_00_00_00_00_00_00");
+--constant C_GET_DESCRIPTOR_REPORT_277h : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_77_02");
 --
 
 constant OUT_OUT:std_logic_vector(7 downto 0):="10000111";
 constant OUT_DATA1:std_logic_vector(3*8-1 downto 0):=DATA1 & "0000000000000000";
-
-
-
 
 --constant GET_DESCRIPTOR_CONFIG_SETUP:std_logic_vector(3*8-1 downto 0):="10110100" & "10000000"&"000" & "10111";
 --constant GET_DESCRIPTOR_CONFIG_SETUP_DATA0:std_logic_vector(11*8-1 downto 0):="11000011" & "00000001"&"01100000" & "00000000"&"01000000" & "00000000"&"00000000" & "10010000"&"00000000" & "0111010100100000";
@@ -132,7 +131,7 @@ constant DEMI_PAS:integer:=2;--5/2;
 constant TIME_OUT:integer:=8; -- 7.5bit
 
 signal step_ps3_test:integer range 0 to 11:=0;
-signal step_cmd: integer range 0 to 15 := 0;
+signal step_cmd: integer range 0 to 1+C_usb_enum_sequence'high := 0;
 
 begin
 
@@ -1416,53 +1415,16 @@ crc5_value:=(others=>'0');
 
 if next_cmd then
 	next_cmd:=false;
-	case (step_cmd) is
-		when 0=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_40h);
-			step_cmd<=1;
-		when 1=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
---			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_3_4h);
-			step_cmd<=2;
-		when 2=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
---			trame_read(C_ADDR0_ENDP0,C_URB_CONTROL_IN_4h);
-			step_cmd<=3;
-		when 3=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
---			trame_set(C_ADDR0_ENDP0,C_URB_CONTROL_OUT_1_14h);
-			step_cmd<=4;
-		when 4=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_DEVICE_12h);
-			step_cmd<=5;
-		when 5=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_09h);
-			step_cmd<=6;
-		when 6=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_CONFIG_29h);
-			step_cmd<=7;
-		when 7=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
-			step_cmd<=8;
-		when 8=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_1_FFh);
-			step_cmd<=9;
-		when 9=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_2_FFh);
-			step_cmd<=10;
-		when 10=>
-			trame_set(C_ADDR0_ENDP0,C_SET_CONFIGURATION_1); -- no OUT
-			step_cmd<=11;
-		when 11=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_STRING_0_FFh);
---			trame_set(ADDR0_ENDP0,C_SET_IDLE_0); -- joystick will not work
-			step_cmd<=12;
-		when 12=>
-			trame_read(C_ADDR0_ENDP0,C_GET_DESCRIPTOR_REPORT_277h);
-			step_cmd<=13;
-		when others =>
-			plug(C_ADDR0_ENDP1);
-	end case;
+	if step_cmd /= 1+C_usb_enum_sequence'high then
+		if C_usb_enum_sequence(step_cmd).usbpacket = C_usbpacket_read then
+			trame_read(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
+		else
+			trame_set(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
+		end if;
+		step_cmd <= step_cmd+1;
+	else
+		plug(C_PLUG_TOKEN);
+	end if;
 else
   if reset='1' then
     step_cmd <= 0;

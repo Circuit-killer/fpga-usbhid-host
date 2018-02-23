@@ -173,7 +173,7 @@ begin
   led(7 downto 0) <= R_blinky(R_blinky'high downto R_blinky'high-7);
   end generate;
 
-  usb_saitek_inst: entity USB_saitek
+  usb_saitek_inst: entity usbhid_host
   port map
   (
     clk7_5MHz => clk_7M5Hz,
@@ -181,7 +181,7 @@ begin
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
-    leds => open -- debug
+    leds => led -- debug
   );
 
   -- hat decoder  
@@ -195,7 +195,7 @@ begin
                 "1010" when S_hat = "0111" else -- up+left
                 "0000";          -- "1111" when not pressed
 
-  led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
+  -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
   -- led <= S_btn_a & S_btn_b & S_btn_x & S_btn_y & S_btn_left_bumper & S_btn_right_bumper & S_btn_left_trigger & S_btn_right_trigger;
   -- led <= "00" & S_btn_back & S_btn_start & S_btn_left_pad & S_btn_right_pad & S_btn_fps & S_btn_fps_toggle;
   -- led(5 downto 0) <= S_analog_trigger;
