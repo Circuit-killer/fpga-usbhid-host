@@ -18,6 +18,14 @@ package hid_enum_pack is
 constant C_usbpacket_set: integer := 0;
 constant C_usbpacket_read: integer := 1;
 
+-- this is for low-speed USB1.0 device:
+constant UN:std_logic_vector(1 downto 0):="01"; --lowspeed
+constant ZERO:std_logic_vector(1 downto 0):="10"; --lowspeed
+
+-- this is for full-speed USB1.1 device:
+-- constant UN:std_logic_vector(1 downto 0):="10"; --fullspeed
+-- constant ZERO:std_logic_vector(1 downto 0):="01"; --fullspeed
+
 -- orig source
 --constant ACK  :std_logic_vector(7 downto 0):="01001011";
 --constant NACK :std_logic_vector(7 downto 0):="01011010";
