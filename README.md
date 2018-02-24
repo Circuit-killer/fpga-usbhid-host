@@ -48,9 +48,11 @@ Eventually some packets will not work so experiment a bit.
 
 # Troubleshooting
 
-State machine doesn't work with every device. Some don't
-work at all or are too unreliable to be useful. Try to find
-a device which reliably responds to enumeration packets first.
+State machine needs to be improved, please contribute!
+Currently only a few devices from many will work. Some
+almost work but it's too unreliable to be useful. 
+When choosing a candidate device, you need to find one
+which reliably responds to descriptor requests first.
 
 Around line 330 in "usbhid_host.vhd" is some LED debug logic. 
 On Lower 4 LED bits is shown state of the packet replay machine.
