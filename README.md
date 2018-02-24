@@ -46,13 +46,22 @@ any comprehensive name like this:
 
 Eventually some packets will not work so experiment a bit.
 
-# Troubleshooting
+# Compatibility
 
 State machine needs to be improved, please contribute!
 Currently only a few devices from many will work. Some
-almost work but it's too unreliable to be useful. 
+almost work but it's too unreliable to be useful.
 When choosing a candidate device, you need to find one
 which reliably responds to descriptor requests first.
+
+HID devices based on open source AVR firmware 
+[V-USB](https://www.obdev.at/products/vusb/index.html) 
+will work.
+
+# Troubleshooting
+
+Low speed (USB1.0) devices need 7.5 MHz clock, High speed (USB1.1)
+need 60 MHz clock.
 
 Around line 330 in "usbhid_host.vhd" is some LED debug logic. 
 On Lower 4 LED bits is shown state of the packet replay machine.
