@@ -324,7 +324,16 @@ begin
 
 step_ps3_test<=step_ps3;
 HID_REPORT <= reverse_any_vector(JOY_mem);
+
 if rising_edge(clk) then
+
+  if reset='1' then
+    step_cmd <= 0;
+    step_ps3 := 0;
+    zap := false;
+  end if; -- reset
+
+  if reset='0' then
 	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
@@ -1405,30 +1414,23 @@ if rising_edge(clk) then
 			counter_SOF_stuff:=0;
 		end if;
 	end if;
-				
 
-if next_cmd then
-	next_cmd:=false;
-	if step_cmd /= 1+C_usb_enum_sequence'high then
+	if next_cmd then
+	  next_cmd:=false;
+	  if step_cmd /= 1+C_usb_enum_sequence'high then
 		if C_usb_enum_sequence(step_cmd).usbpacket = C_usbpacket_read then
 			trame_read(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
 		else
 			trame_set(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
 		end if;
 		step_cmd <= step_cmd+1;
-	else
+	  else
 		plug(C_PLUG_TOKEN);
+	  end if;
 	end if;
-else
-  if reset='1' then
-    step_cmd <= 0;
-    step_ps3 := 0;
-    zap := false;
-  end if;
-end if;
 
-		
-end if;
+  end if; -- not reset
+end if; -- rising edge clk
 
 end process;
 
