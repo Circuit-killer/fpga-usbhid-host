@@ -117,10 +117,10 @@ architecture Behavioral of ulx3s_usbtest is
   signal S_reset: std_logic;
   
   signal S_hid_report: std_logic_vector(63 downto 0);
-  alias S_left_stick_x: std_logic_vector(7 downto 0) is S_hid_report(15 downto 8);
-  alias S_left_stick_y: std_logic_vector(7 downto 0) is S_hid_report(23 downto 16);
-  alias S_right_stick_x: std_logic_vector(7 downto 0) is S_hid_report(31 downto 24);
-  alias S_right_stick_y: std_logic_vector(7 downto 0) is S_hid_report(39 downto 32);
+  alias S_lstick_x: std_logic_vector(7 downto 0) is S_hid_report(15 downto 8);
+  alias S_lstick_y: std_logic_vector(7 downto 0) is S_hid_report(23 downto 16);
+  alias S_rstick_x: std_logic_vector(7 downto 0) is S_hid_report(31 downto 24);
+  alias S_rstick_y: std_logic_vector(7 downto 0) is S_hid_report(39 downto 32);
   alias S_analog_trigger: std_logic_vector(5 downto 0) is S_hid_report(45 downto 40);
   alias S_btn_x: std_logic is S_hid_report(46);
   alias S_btn_a: std_logic is S_hid_report(47);
@@ -142,6 +142,9 @@ architecture Behavioral of ulx3s_usbtest is
   alias S_hat_down: std_logic is S_hat_udlr(2);
   alias S_hat_left: std_logic is S_hat_udlr(1);
   alias S_hat_right: std_logic is S_hat_udlr(0);
+  -- decoded stick to digital
+  signal S_lstick_up, S_lstick_down, S_lstick_left, S_lstick_right: std_logic;
+  signal S_rstick_up, S_rstick_down, S_rstick_left, S_rstick_right: std_logic;
 
 begin
   clk_pll: entity work.clk_25M_100M_7M5_12M_60M
@@ -173,10 +176,10 @@ begin
   led(7 downto 0) <= R_blinky(R_blinky'high downto R_blinky'high-7);
   end generate;
 
-  usb_saitek_inst: entity usbhid_host
+  usbhid_host_inst: entity usbhid_host
   port map
   (
-    clk7_5MHz => clk_7M5Hz,
+    clk => clk_7M5Hz,
     reset => S_reset,
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
@@ -184,7 +187,7 @@ begin
     leds => led -- debug
   );
 
-  -- hat decoder  
+  -- hat decoder 
   S_hat_udlr <= "1000" when S_hat = "0000" else -- up
                 "1001" when S_hat = "0001" else -- up+right
                 "0001" when S_hat = "0010" else -- right
@@ -194,6 +197,15 @@ begin
                 "0010" when S_hat = "0110" else -- left
                 "1010" when S_hat = "0111" else -- up+left
                 "0000";          -- "1111" when not pressed
+  -- analog stick to digital decoders
+  S_lstick_left  <= '1' when S_lstick_x(7 downto 6) = "00" else '0';
+  S_lstick_right <= '1' when S_lstick_x(7 downto 6) = "11" else '0';
+  S_lstick_up    <= '1' when S_lstick_y(7 downto 6) = "00" else '0';
+  S_lstick_down  <= '1' when S_lstick_y(7 downto 6) = "11" else '0';
+  S_rstick_left  <= '1' when S_rstick_x(7 downto 6) = "00" else '0';
+  S_rstick_right <= '1' when S_rstick_x(7 downto 6) = "11" else '0';
+  S_rstick_up    <= '1' when S_rstick_y(7 downto 6) = "00" else '0';
+  S_rstick_down  <= '1' when S_rstick_y(7 downto 6) = "11" else '0';
 
   -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
   -- led <= S_btn_a & S_btn_b & S_btn_x & S_btn_y & S_btn_left_bumper & S_btn_right_bumper & S_btn_left_trigger & S_btn_right_trigger;
@@ -210,10 +222,10 @@ begin
   -- led <= usb_data_gen(crc16_test_message) (7 downto 0);
   -- led <= usb_data_gen(crc16_test_message) (15 downto 8);
 
-  --led <= x"01" when ADDR1_ENDP1 = usb_token_gen(C_ADDR1_ENDP1)
-  --led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
-  --led <= x"01" when SET_ADDRESS_1 = usb_data_gen(C_SET_ADDRESS_1)
-  --led <= x"01" when GET_DESCRIPTOR_DEVICE_40h = usb_data_gen(C_GET_DESCRIPTOR_DEVICE_40h)
-  --  else x"55"; -- this is shown if test failed
+  -- led <= x"01" when ADDR1_ENDP1 = usb_token_gen(C_ADDR1_ENDP1)
+  -- led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
+  -- led <= x"01" when SET_ADDRESS_1 = usb_data_gen(C_SET_ADDRESS_1)
+  -- led <= x"01" when GET_DESCRIPTOR_DEVICE_40h = usb_data_gen(C_GET_DESCRIPTOR_DEVICE_40h)
+  --   else x"55"; -- this is shown if test failed
 
 end Behavioral;

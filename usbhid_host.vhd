@@ -13,7 +13,7 @@ Generic
 );
 Port
 (
-  CLK7_5MHz  : in    std_logic; -- 7.5 MHz clock
+  clk        : in    std_logic; -- 7.5 MHz clock for USB1.0, 60 MHz for USB1.1
   reset      : in    std_logic := '0'; -- async reset
   USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D- both pull down 15k
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
@@ -135,7 +135,7 @@ signal step_cmd: integer range 0 to 1+C_usb_enum_sequence'high := 0;
 
 begin
 
-process(CLK7_5MHz) is
+process(clk) is
 	variable step_ps3:integer range 0 to 41:=0;
 	variable next_cmd:boolean:=false;
 	variable counter_RESET:integer range 0 to period_RESET*PAS:=0;
@@ -253,7 +253,19 @@ process(CLK7_5MHz) is
 	end procedure;
 	
 	variable time_out:boolean:=false;
-	
+
+	procedure startup_init is
+	begin
+	  step_ps3:=0;
+	  next_cmd:=false;
+	  counter_RESET:=0;
+	  counter_IDLE:=0;
+	  counter_PAS:=0;
+	  counter_SOF_stuff:=0;
+	  counter_TRAME:=0;
+	end procedure;
+
+
 	procedure sof_init is
 	begin
 		counter_RESET:=0;
@@ -308,22 +320,11 @@ process(CLK7_5MHz) is
 	end procedure;
 
 	variable interval:std_logic_vector(7 downto 0):=(others=>'0');
-	
---	variable joystick_left_mem:std_logic:='0';
---	variable joystick_right_mem:std_logic:='0';
---	variable joystick_up_mem:std_logic:='0';
---	variable joystick_down_mem:std_logic:='0';
---	variable joystick_button1_mem:std_logic:='0';
---	variable joystick_button2_mem:std_logic:='0';
---	variable joystick_button3_mem:std_logic:='0';
---	variable joystick_button4_mem:std_logic:='0';
-	
-	
-	
 begin
+
 step_ps3_test<=step_ps3;
 HID_REPORT <= reverse_any_vector(JOY_mem);
-if rising_edge(CLK7_5MHz) then
+if rising_edge(clk) then
 	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
@@ -349,9 +350,9 @@ if rising_edge(CLK7_5MHz) then
 					--cool
 				else
 					-- pas cool
-crc16_value:=(others=>'0');
-crc5_value:=(others=>'0');
--- TRAMES TROP LONGUE POUR TOLERER FATAL ERROR step_ps3:=2;
+					crc16_value:=(others=>'0');
+					crc5_value:=(others=>'0');
+					-- TRAMES TROP LONGUE POUR TOLERER FATAL ERROR step_ps3:=2;
 				end if;
 			else
 				nrzi('0',last_nrzi,result);
@@ -385,6 +386,7 @@ crc5_value:=(others=>'0');
 			--=========
 			when 0=>
 				USB_DATA<="ZZ";
+				startup_init;
 				step_ps3:=3;
 			when 1=> -- test
 			when 2=> -- erreur zap en mode_receive
@@ -392,7 +394,6 @@ crc5_value:=(others=>'0');
 				if USB_DATA=UN then
 					step_ps3:=4;
 				end if;
---step_ps3:=4; -- FOR TESTBENCH
 			--=======
 			-- RESET
 			--=======
@@ -1246,7 +1247,6 @@ crc5_value:=(others=>'0');
 					last_USB_DATA:=EOP;-- not(USB_DATA=ZERO)
 					mode_receive:=true;
 					step_ps3:=37;
---JOY_mem:=JOY_mem+1;
 					counter_TRAME:=0;
 					counter_PAS:=0;
 				end if;
@@ -1352,7 +1352,6 @@ crc5_value:=(others=>'0');
 						counter_TRAME:=counter_TRAME+1;
 					end if;
 				end if;
-			
 			when 40=>
 				-- envoyer un NACK
 				if counter_PAS=DEMI_PAS then
@@ -1378,11 +1377,6 @@ crc5_value:=(others=>'0');
 						counter_TRAME:=counter_TRAME+1;
 					end if;
 				end if;
-			
-				
-
-
-			
 		end case;
 	end if;
 	
@@ -1429,7 +1423,7 @@ else
   if reset='1' then
     step_cmd <= 0;
     step_ps3 := 0;
-    sof_init;
+    zap := false;
   end if;
 end if;
 
