@@ -13,7 +13,7 @@ Started from joystick FPGA USB host driver from
 and made driver for Saitek Cyborg joystick by modifying
 original file "USB_logitech.vhd"
 
-"USB_saitek.vhd" contains "minimal" state machine that acts as USB host for
+"usbhid_host.vhd" contains "minimal" state machine that acts as USB host for
 the joystick. Instead of proper enumeration, it replays constant USB 
 packets to initialize the joystick, receives eventual USB response, 
 ignores it and starts listening to USB HID reports.
@@ -23,7 +23,7 @@ reverse bit order and calculate crc5 and crc16, for easier creating
 VHDL usb packet hex constants.
 
 New HID device may be USB-sniffed with wireshark on linux
-and then file "USB_saitek.vhd" can be modified to support new device.
+and then file "usb_enum_saitek_minimal_pack.vhd" can be modified to support new device.
 
     modprobe usbmon
     chown user:user /dev/usbmon*
@@ -38,19 +38,21 @@ Click on "URB setup", 8-byte data will be hightlighted:
 
     80 06 00 01 00 00 12 00
 
-and copy it to the USB constants in "USB_saitek.vhd" giving them
+and copy it to the USB constants in "usb_enum_saitek_minimal_pack.vhd" giving them
 any comprehensive name like this:
 
     constant C_GET_DESCRIPTOR_DEVICE_12h: std_logic_vector(11*8-1 downto 0) :=
       usb_data_gen(C_DATA0 & x"80_06_00_01_00_00_12_00"):
 
-At the end of "USB_saitek.vhd" file, modify the state machine 
-to replay the constants to the joystick in the order of appearance as sniffed.
 Eventually some packets will not work so experiment a bit.
 
 # Troubleshooting
 
-Around line 330 in "USB_saitek.vhd" is some LED debug logic. 
+State machine doesn't work with every device. Some don't
+work at all or are too unreliable to be useful. Try to find
+a device which reliably responds to enumeration packets first.
+
+Around line 330 in "usbhid_host.vhd" is some LED debug logic. 
 On Lower 4 LED bits is shown state of the packet replay machine.
 Keep the joystick plugged in, upload the bitstream over jtag and
 watch lower 4 LEDs.
@@ -66,11 +68,12 @@ drives LED without any noticeable delay.
 
 If joystick works but has latency (from pressing joystick buttons to signal
 response there is some short but annying delay of 100-200 ms), try 
-reducing bInterval value from 10 (x"0A") to 1 (x"01") around line 30 
-in "USB_saitek.vhd".
+reducing bInterval value from 10 (x"0A") to 1 (x"01") in 
+"usb_enum_saitek_minimal_pack.vhd".
 
-If joystick is re-plugged, it will stop working until FPGA bitstream 
-is reloaded. State machine could be improved for user convenience.
+If joystick is re-plugged, it will stop working until "reset" signal
+is issued. Sometimes even reset doens't work, so reload FPGA bitstream
+might help. State machine could be improved for user convenience.
 
 # Additional info from original source
 
