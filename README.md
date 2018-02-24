@@ -60,8 +60,8 @@ will work.
 
 # Troubleshooting
 
-Low speed (USB1.0) devices need 7.5 MHz clock, High speed (USB1.1)
-need 60 MHz clock.
+Low speed (USB1.0) devices need 7.5 MHz clock.
+Full speed (USB1.1) devices need 60 MHz clock.
 
 Around line 330 in "usbhid_host.vhd" is some LED debug logic. 
 On Lower 4 LED bits is shown state of the packet replay machine.
