@@ -184,7 +184,7 @@ begin
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
-    leds => led -- debug
+    leds => led -- led/open debug
   );
 
   -- hat decoder 
@@ -207,6 +207,8 @@ begin
   S_rstick_up    <= '1' when S_rstick_y(7 downto 6) = "00" else '0';
   S_rstick_down  <= '1' when S_rstick_y(7 downto 6) = "11" else '0';
 
+  -- led <= S_lstick_left & S_lstick_right & S_lstick_up & S_lstick_down
+  --      & S_rstick_left & S_rstick_right & S_rstick_up & S_rstick_down;
   -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
   -- led <= S_btn_a & S_btn_b & S_btn_x & S_btn_y & S_btn_left_bumper & S_btn_right_bumper & S_btn_left_trigger & S_btn_right_trigger;
   -- led <= "00" & S_btn_back & S_btn_start & S_btn_left_pad & S_btn_right_pad & S_btn_fps & S_btn_fps_toggle;

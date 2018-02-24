@@ -52,6 +52,7 @@ constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb
 -- final token that will read HID reports
 constant C_PLUG_TOKEN: std_logic_vector(11+5-1 downto 0) := C_ADDR0_ENDP1;
 constant bInterval: std_logic_vector(7 downto 0) := x"01"; -- HID report interval, lower value means faster
+constant C_IDLE_REPORT: std_logic_vector(63 downto 0) := x"70_00_00_80_80_80_80_00"; -- report when unplugged
 
 type T_usb_message is
 record

@@ -147,7 +147,7 @@ process(clk) is
 	
 	variable last_USB_DATA:std_logic_vector(1 downto 0):=EOP;
 	variable mode_receive:boolean:=false;
-	variable JOY_mem:std_logic_vector(8*REPORT_LEN-1 downto 0):=(others=>'0');
+	variable JOY_mem:std_logic_vector(8*REPORT_LEN-1 downto 0):=reverse_any_vector(C_IDLE_REPORT);
 	variable JOY_CANDIDATE_mem:std_logic_vector(8*REPORT_LEN-1 downto 0):=(others=>'0');
 	constant DATA_MAX_SIZE:integer:=8*REPORT_LEN;
 	variable SIZE_mem:std_logic_vector(7 downto 0):=(others=>'0');
@@ -397,6 +397,7 @@ if rising_edge(clk) then
 				USB_DATA<="ZZ";
 				startup_init;
 				step_ps3:=3;
+				JOY_mem := reverse_any_vector(C_IDLE_REPORT);
 			when 1=> -- test
 			when 2=> -- erreur zap en mode_receive
 			when 3=>
