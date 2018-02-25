@@ -192,30 +192,13 @@ begin
     btn_fps => S_btn_fps, btn_fps_toggle => S_btn_fps_toggle
   );
 
-  --led <= S_mouseq_x & S_mouseq_y
-  --     & S_btn_lstick & S_btn_rstick & S_btn_back & S_btn_start;
-
+  led <= S_mouseq_x & S_mouseq_y
+       & S_btn_lstick & S_btn_rstick & S_btn_back & S_btn_start;
   -- led <= S_lstick_left & S_lstick_right & S_lstick_up & S_lstick_down
   --      & S_rstick_left & S_rstick_right & S_rstick_up & S_rstick_down;
-  led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
+  -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;
   -- led <= S_btn_a & S_btn_b & S_btn_x & S_btn_y & S_btn_left_bumper & S_btn_right_bumper & S_btn_left_trigger & S_btn_right_trigger;
-  -- led <= "00" & S_btn_back & S_btn_start & S_btn_left_pad & S_btn_right_pad & S_btn_fps & S_btn_fps_toggle;
+  -- led <= "00" & S_btn_back & S_btn_start & S_btn_lstick & S_btn_rstick & S_btn_fps & S_btn_fps_toggle;
   -- led(5 downto 0) <= S_analog_trigger;
-
-  -- small test suite for usb packet generator
-  -- led <= reverse_any_vector(x"07");
-  -- led <= DATA0;
-  -- led <= GET_DESCRIPTOR_DEVICE_40h(87 downto 87-7);
-  -- led <= CN_GET_DESCRIPTOR_DEVICE_40h(87 downto 87-7);
-  -- led <= GET_DESCRIPTOR_DEVICE_40h(7 downto 0);
-  -- led <= CN_GET_DESCRIPTOR_DEVICE_40h(15 downto 8);
-  -- led <= usb_data_gen(crc16_test_message) (7 downto 0);
-  -- led <= usb_data_gen(crc16_test_message) (15 downto 8);
-
-  -- led <= x"01" when ADDR1_ENDP1 = usb_token_gen(C_ADDR1_ENDP1)
-  -- led <= x"01" when GET_DESCRIPTOR_REPORT_B7h = usb_data_gen(C_GET_DESCRIPTOR_REPORT_B7h)
-  -- led <= x"01" when SET_ADDRESS_1 = usb_data_gen(C_SET_ADDRESS_1)
-  -- led <= x"01" when GET_DESCRIPTOR_DEVICE_40h = usb_data_gen(C_GET_DESCRIPTOR_DEVICE_40h)
-  --   else x"55"; -- this is shown if test failed
 
 end Behavioral;
