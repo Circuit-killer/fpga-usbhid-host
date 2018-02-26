@@ -6,6 +6,7 @@ use IEEE.std_logic_unsigned.ALL;
 entity usbhid_report_decoder is
 generic
 (
+  C_reg_input: boolean := false; -- take input in register (release timing)
   -- mouse speed also depends on clk
   C_mousex_scaler: integer := 24; -- less -> faster mouse
   C_mousey_scaler: integer := 24  -- less -> faster mouse
@@ -63,12 +64,19 @@ architecture rtl of usbhid_report_decoder is
   signal R_mousecx: std_logic_vector(C_mousex_scaler-1 downto 0);
   signal R_mousecy: std_logic_vector(C_mousey_scaler-1 downto 0);
 begin
+
+  yes_reg_input: if C_reg_input generate
   process(clk) is
   begin
     if rising_edge(clk) then
       R_hid_report <= hid_report; -- register to release timing closure
     end if;
   end process;
+  end generate;
+
+  no_reg_input: if not C_reg_input generate
+    R_hid_report <= hid_report; -- directly take input
+  end generate;
 
   -- simple buttons
   btn_x <= S_btn_x;
