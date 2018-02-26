@@ -66,13 +66,12 @@ constant C_GET_DESCRIPTOR_STRING_0_FFh: std_logic_vector(11*8-1 downto 0) := usb
 constant C_GET_DESCRIPTOR_STRING_1_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_01_03_09_04_FF_00");
 constant C_GET_DESCRIPTOR_STRING_2_FFh: std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"80_06_02_03_09_04_FF_00");
 constant C_SET_CONFIGURATION_1        : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"00_09_01_00_00_00_00_00");
-constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_0A_00_00_00_00_00_00");
 constant C_GET_DESCRIPTOR_REPORT_41h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_41_00");
-constant C_SET_REPORT_200h            : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_09_00_02_00_00_01_00");
 constant C_GET_DESCRIPTOR_REPORT_8Bh  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_8B_00");
+constant C_SET_REPORT_200h            : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_09_00_02_00_00_01_00");
 -- final token that will read HID reports
 constant C_PLUG_TOKEN: std_logic_vector(11+5-1 downto 0) := C_ADDR0_ENDP1;
-constant bInterval: std_logic_vector(7 downto 0) := x"01"; -- HID report interval, lower value means faster
+constant bInterval: std_logic_vector(7 downto 0) := x"04"; -- HID report interval, lower value means faster
 constant C_IDLE_REPORT: std_logic_vector(63 downto 0) := x"70_00_00_80_80_80_80_00"; -- report when unplugged
 
 
@@ -82,7 +81,7 @@ record
     token:      std_logic_vector(15 downto 0); -- usb token 16-bit (5-bit crc included)
     data:       std_logic_vector(87 downto 0); -- usb data 88-bit (16-bit crc included)
 end record;
-type T_usb_enum_sequence is array (0 to 10) of T_usb_message;
+type T_usb_enum_sequence is array (0 to 11) of T_usb_message;
 constant C_usb_enum_sequence: T_usb_enum_sequence :=
   (
     ( -- 0
@@ -131,15 +130,19 @@ constant C_usb_enum_sequence: T_usb_enum_sequence :=
       data      =>  C_GET_DESCRIPTOR_REPORT_41h
     ),
     ( -- 9
-      usbpacket =>  C_usbpacket_set,
-      token     =>  C_ADDR0_ENDP0,
-      --data      =>  C_SET_REPORT_200h -- problem, stops after this
-      data      =>  C_SET_CONFIGURATION_1 -- this one passes
-    ),
-    ( -- 10
       usbpacket =>  C_usbpacket_read,
       token     =>  C_ADDR0_ENDP0,
       data      =>  C_GET_DESCRIPTOR_REPORT_8Bh
+    ),
+    ( -- 10
+      usbpacket =>  C_usbpacket_set,
+      token     =>  C_ADDR0_ENDP0,
+      data      =>  C_SET_REPORT_200h -- problem, stops after this
+    ),
+    ( -- 11
+      usbpacket =>  C_usbpacket_set,
+      token     =>  C_ADDR0_ENDP0,
+      data      =>  C_SET_REPORT_200h -- problem, stops after this
     )
   );
 end;
