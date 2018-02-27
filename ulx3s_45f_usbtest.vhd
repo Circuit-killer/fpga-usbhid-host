@@ -99,6 +99,7 @@ begin
   wifi_gpio0 <= btn(0);
   S_reset <= not btn(0);
 
+  --u1: if true generate
   usbhid_host_inst: entity usbhid_host
   port map
   (
@@ -109,6 +110,19 @@ begin
     hid_report => S_hid_report,
     leds => led -- led/open debug
   );
+  --end generate;
+
+  --u2: if false generate
+  --ps3_inst: entity usb_ps3
+  --port map
+  --(
+  --  clk60MHz => clk_60MHz,
+  --  plage => (others => '0'),
+  --  usb_data(1) => usb_fpga_dp,
+  --  usb_data(0) => usb_fpga_dn,
+  --  leds => led -- led/open debug
+  --);
+  --end generate;
   
   usbhid_report_decoder_inst: entity usbhid_report_decoder
   generic map
