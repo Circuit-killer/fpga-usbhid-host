@@ -12,6 +12,8 @@ use ecp5u.components.all;
 
 -- USB packet generator functions
 use work.usb_req_gen_func_pack.all;
+-- package for decoded structure
+use work.report_decoded_pack.all;
 
 entity ulx3s_usbtest is
   generic
@@ -75,38 +77,9 @@ end;
 
 architecture Behavioral of ulx3s_usbtest is
   signal clk_100MHz, clk_60MHz, clk_7M5Hz, clk_12MHz: std_logic;
-  signal R_blinky: std_logic_vector(26 downto 0);
-
-  signal S_reset: std_logic;
-  
+  signal S_reset: std_logic;  
   signal S_hid_report: std_logic_vector(63 downto 0);
-  signal S_lstick_x: std_logic_vector(7 downto 0);
-  signal S_lstick_y: std_logic_vector(7 downto 0);
-  signal S_rstick_x: std_logic_vector(7 downto 0);
-  signal S_rstick_y: std_logic_vector(7 downto 0);
-  signal S_analog_trigger: std_logic_vector(5 downto 0);
-  signal S_btn_a: std_logic;
-  signal S_btn_b: std_logic;
-  signal S_btn_x: std_logic;
-  signal S_btn_y: std_logic;
-  signal S_btn_left_bumper: std_logic;
-  signal S_btn_right_bumper: std_logic;
-  signal S_btn_left_trigger: std_logic;
-  signal S_btn_right_trigger: std_logic;
-  signal S_btn_back: std_logic;
-  signal S_btn_start: std_logic;
-  signal S_btn_lstick: std_logic;
-  signal S_btn_rstick: std_logic;
-  signal S_btn_fps: std_logic;
-  signal S_btn_fps_toggle: std_logic;
-  signal S_hat_up: std_logic;
-  signal S_hat_down: std_logic;
-  signal S_hat_left: std_logic;
-  signal S_hat_right: std_logic;
-  -- decoded stick to digital
-  signal S_lstick_up, S_lstick_down, S_lstick_left, S_lstick_right: std_logic;
-  signal S_rstick_up, S_rstick_down, S_rstick_left, S_rstick_right: std_logic;
-  signal S_mouseq_x, S_mouseq_y: std_logic_vector(1 downto 0);
+  signal S_report_decoded: T_report_decoded;
 begin
   clk_pll: entity work.clk_25M_100M_7M5_12M_60M
   port map
@@ -126,17 +99,6 @@ begin
   wifi_gpio0 <= btn(0);
   S_reset <= not btn(0);
 
-  -- clock alive blinky
-  blink: if false generate
-  process(clk_7M5Hz)
-  begin
-      if rising_edge(clk_7M5Hz) then
-        R_blinky <= R_blinky+1;
-      end if;
-  end process;
-  led(7 downto 0) <= R_blinky(R_blinky'high downto R_blinky'high-7);
-  end generate;
-
   usbhid_host_inst: entity usbhid_host
   port map
   (
@@ -145,7 +107,7 @@ begin
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
-    leds => open -- led/open debug
+    leds => led -- led/open debug
   );
   
   usbhid_report_decoder_inst: entity usbhid_report_decoder
@@ -158,42 +120,11 @@ begin
   (
     clk => clk_7M5Hz,
     hid_report => S_hid_report,
-    lstick_x => S_lstick_x,
-    lstick_y => S_lstick_y,
-    rstick_x => S_rstick_x,
-    rstick_y => S_rstick_y,
-    analog_trigger => S_analog_trigger,
-    mouseq_x => S_mouseq_x,
-    mouseq_y => S_mouseq_y,
-    lstick_up => S_lstick_up,
-    lstick_down => S_lstick_down,
-    lstick_left => S_lstick_left,
-    lstick_right => S_lstick_right,
-    rstick_up => S_rstick_up,
-    rstick_down => S_rstick_down,
-    rstick_left => S_rstick_left,
-    rstick_right => S_rstick_right,
-    hat_up => S_hat_up,
-    hat_down => S_hat_down,
-    hat_left => S_hat_left,
-    hat_right => S_hat_right,
-    btn_a => S_btn_a,
-    btn_b => S_btn_b,
-    btn_x => S_btn_x,
-    btn_y => S_btn_y,
-    btn_left_bumper => S_btn_left_bumper,
-    btn_right_bumper => S_btn_right_bumper,
-    btn_left_trigger => S_btn_left_trigger,
-    btn_right_trigger => S_btn_right_trigger,
-    btn_back => S_btn_back,
-    btn_start => S_btn_start,
-    btn_lstick => S_btn_lstick,
-    btn_rstick => S_btn_rstick,
-    btn_fps => S_btn_fps, btn_fps_toggle => S_btn_fps_toggle
+    decoded => S_report_decoded
   );
 
-  led <= S_mouseq_x & S_mouseq_y
-       & S_btn_lstick & S_btn_rstick & S_btn_back & S_btn_start;
+  -- led <= S_report_decoded.mouseq_x & S_report_decoded.mouseq_y
+  --      & S_report_decoded.btn_lstick & S_report_decoded.btn_rstick & S_report_decoded.btn_back & S_report_decoded.btn_start;
   -- led <= S_lstick_left & S_lstick_right & S_lstick_up & S_lstick_down
   --      & S_rstick_left & S_rstick_right & S_rstick_up & S_rstick_down;
   -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;

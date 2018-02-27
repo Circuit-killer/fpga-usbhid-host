@@ -3,6 +3,8 @@ use IEEE.std_logic_1164.ALL;
 use IEEE.std_logic_arith.ALL;
 use IEEE.std_logic_unsigned.ALL;
 
+use work.report_decoded_pack.all;
+
 entity usbhid_report_decoder is
 generic
 (
@@ -15,19 +17,7 @@ port
 (
   clk: in std_logic; -- 7.5 MHz clock for USB1.0, 60 MHz for USB1.1
   hid_report: in std_logic_vector(63 downto 0);
-  -- decoded outputs:
-  lstick_x, lstick_y, rstick_x, rstick_y: out std_logic_vector(7 downto 0); -- up/left=0 idle=128 down/right=255
-  analog_trigger: out std_logic_vector(5 downto 0);
-  mouseq_x, mouseq_y: out std_logic_vector(1 downto 0); -- quadrature encoder output
-  hat_up, hat_down, hat_left, hat_right: out std_logic;
-  lstick_up, lstick_down, lstick_left, lstick_right: out std_logic;
-  rstick_up, rstick_down, rstick_left, rstick_right: out std_logic;
-  btn_a, btn_b, btn_x, btn_y: out std_logic;
-  btn_left_bumper, btn_right_bumper: out std_logic;
-  btn_left_trigger, btn_right_trigger: out std_logic;
-  btn_back, btn_start: out std_logic;
-  btn_lstick, btn_rstick: out std_logic;
-  btn_fps, btn_fps_toggle: out std_logic
+  decoded: out T_report_decoded
 );
 end;
 
@@ -79,20 +69,20 @@ begin
   end generate;
 
   -- simple buttons
-  btn_x <= S_btn_x;
-  btn_a <= S_btn_a;
-  btn_b <= S_btn_b;
-  btn_y <= S_btn_y;
-  btn_left_bumper <= S_btn_left_bumper;
-  btn_right_bumper <= S_btn_right_bumper;
-  btn_left_trigger <= S_btn_left_trigger;
-  btn_right_trigger <= S_btn_right_trigger;
-  btn_back <= S_btn_back;
-  btn_start <= S_btn_start;
-  btn_lstick <= S_btn_lstick;
-  btn_rstick <= S_btn_rstick;
-  btn_fps <= S_btn_fps;
-  btn_fps_toggle <= S_btn_fps_toggle;
+  decoded.btn_x <= S_btn_x;
+  decoded.btn_a <= S_btn_a;
+  decoded.btn_b <= S_btn_b;
+  decoded.btn_y <= S_btn_y;
+  decoded.btn_left_bumper <= S_btn_left_bumper;
+  decoded.btn_right_bumper <= S_btn_right_bumper;
+  decoded.btn_left_trigger <= S_btn_left_trigger;
+  decoded.btn_right_trigger <= S_btn_right_trigger;
+  decoded.btn_back <= S_btn_back;
+  decoded.btn_start <= S_btn_start;
+  decoded.btn_lstick <= S_btn_lstick;
+  decoded.btn_rstick <= S_btn_rstick;
+  decoded.btn_fps <= S_btn_fps;
+  decoded.btn_fps_toggle <= S_btn_fps_toggle;
 
   -- hat decoder 
   S_hat_udlr <= "1000" when S_hat = "0000" else -- up
@@ -106,22 +96,22 @@ begin
                 "0000";          -- "1111" when not pressed
 
   -- hat as buttons
-  hat_up <= S_hat_up;
-  hat_down <= S_hat_down;
-  hat_left <= S_hat_left;
-  hat_right <= S_hat_right;
+  decoded.hat_up <= S_hat_up;
+  decoded.hat_down <= S_hat_down;
+  decoded.hat_left <= S_hat_left;
+  decoded.hat_right <= S_hat_right;
 
   -- analog stick to digital decoders
-  lstick_left  <= '1' when S_lstick_x(7 downto 6) = "00" else '0';
-  lstick_right <= '1' when S_lstick_x(7 downto 6) = "11" else '0';
-  lstick_up    <= '1' when S_lstick_y(7 downto 6) = "00" else '0';
-  lstick_down  <= '1' when S_lstick_y(7 downto 6) = "11" else '0';
-  rstick_left  <= '1' when S_rstick_x(7 downto 6) = "00" else '0';
-  rstick_right <= '1' when S_rstick_x(7 downto 6) = "11" else '0';
-  rstick_up    <= '1' when S_rstick_y(7 downto 6) = "00" else '0';
-  rstick_down  <= '1' when S_rstick_y(7 downto 6) = "11" else '0';
+  decoded.lstick_left  <= '1' when S_lstick_x(7 downto 6) = "00" else '0';
+  decoded.lstick_right <= '1' when S_lstick_x(7 downto 6) = "11" else '0';
+  decoded.lstick_up    <= '1' when S_lstick_y(7 downto 6) = "00" else '0';
+  decoded.lstick_down  <= '1' when S_lstick_y(7 downto 6) = "11" else '0';
+  decoded.rstick_left  <= '1' when S_rstick_x(7 downto 6) = "00" else '0';
+  decoded.rstick_right <= '1' when S_rstick_x(7 downto 6) = "11" else '0';
+  decoded.rstick_up    <= '1' when S_rstick_y(7 downto 6) = "00" else '0';
+  decoded.rstick_down  <= '1' when S_rstick_y(7 downto 6) = "11" else '0';
 
-  analog_trigger <= S_analog_trigger;
+  decoded.analog_trigger <= S_analog_trigger;
   
   -- mouse counters
   process(clk)
@@ -133,12 +123,12 @@ begin
   end process;
 
   -- mouse quadrature encoders
-  mouseq_x  <= "01" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "00" else
-               "11" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "01" else
-               "10" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "10" else
-               "00"; -- when "11"
-  mouseq_y  <= "01" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "00" else
-               "11" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "01" else
-               "10" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "10" else
-               "00"; -- when "11"
+  decoded.mouseq_x  <= "01" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "00" else
+                       "11" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "01" else
+                       "10" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "10" else
+                       "00"; -- when "11"
+  decoded.mouseq_y  <= "01" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "00" else
+                       "11" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "01" else
+                       "10" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "10" else
+                       "00"; -- when "11"
 end rtl;

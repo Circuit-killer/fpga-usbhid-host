@@ -5,6 +5,7 @@ use IEEE.std_logic_unsigned.ALL;
 
 use work.usb_req_gen_func_pack.ALL; -- we need reverse_any_vector()
 use work.hid_enum_pack.ALL;
+use work.usbhid_decoded_pack.all;
 
 entity usbhid_host is
 Generic
