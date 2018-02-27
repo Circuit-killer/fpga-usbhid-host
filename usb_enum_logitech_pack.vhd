@@ -16,8 +16,10 @@ use work.usb_req_gen_func_pack.ALL;
 package hid_enum_pack is
 
 -- packet types
-constant C_usbpacket_set: integer := 0;
+constant C_usbpacket_set:  integer := 0;
 constant C_usbpacket_read: integer := 1;
+constant C_usbpacket_plug: integer := 2;
+constant C_usbpacket_max:  integer := 2; -- max number
 
 -- this is for low-speed USB1.0 device:
 constant UN:std_logic_vector(1 downto 0):="01"; --lowspeed
@@ -67,17 +69,16 @@ constant C_SET_IDLE_0                 : std_logic_vector(11*8-1 downto 0) := usb
 constant C_GET_DESCRIPTOR_REPORT_41h  : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"81_06_00_22_00_00_41_00");
 constant C_SET_REPORT_REQUEST_200h    : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_09_00_02_00_00_01_00");
 -- final token that will read HID reports
-constant C_PLUG_TOKEN: std_logic_vector(11+5-1 downto 0) := C_ADDR0_ENDP1;
 constant bInterval: std_logic_vector(7 downto 0) := x"01"; -- HID report interval, lower value means faster
 constant C_IDLE_REPORT: std_logic_vector(63 downto 0) := x"70_00_00_80_80_80_80_00"; -- report when unplugged
 
 type T_usb_message is
 record
-    usbpacket:  integer range 0 to 1;          -- usb transmission mode set,read
+    usbpacket:  integer range 0 to C_usbpacket_max; -- usb transmission mode set,read
     token:      std_logic_vector(15 downto 0); -- usb token 16-bit (5-bit crc included)
     data:       std_logic_vector(87 downto 0); -- usb data 88-bit (16-bit crc included)
 end record;
-type T_usb_enum_sequence is array (0 to 9) of T_usb_message;
+type T_usb_enum_sequence is array (0 to 11) of T_usb_message;
 constant C_usb_enum_sequence: T_usb_enum_sequence :=
   (
     ( -- 0
@@ -129,6 +130,16 @@ constant C_usb_enum_sequence: T_usb_enum_sequence :=
       usbpacket =>  C_usbpacket_set,
       token     =>  C_ADDR0_ENDP0,
       data      =>  C_SET_REPORT_REQUEST_200h
+    ),
+    ( -- 10
+      usbpacket =>  C_usbpacket_plug,
+      token     =>  C_ADDR0_ENDP0,
+      data      =>  (others => '-')
+    ),
+    ( -- 11
+      usbpacket =>  C_usbpacket_plug,
+      token     =>  C_ADDR0_ENDP1,
+      data      =>  (others => '-')
     )
   );
 end;

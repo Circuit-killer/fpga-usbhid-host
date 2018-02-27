@@ -132,7 +132,7 @@ constant DEMI_PAS:integer:=2;--5/2;
 constant TIME_OUT:integer:=8; -- 7.5bit
 
 signal step_ps3_test:integer range 0 to 11:=0;
-signal step_cmd: integer range 0 to 1+C_usb_enum_sequence'high := 0;
+signal step_cmd: integer range 0 to C_usb_enum_sequence'high := 0;
 
 begin
 
@@ -1418,17 +1418,17 @@ if rising_edge(clk) then
 	end if;
 
 	if next_cmd then
-	  next_cmd:=false;
-	  if step_cmd /= 1+C_usb_enum_sequence'high then
+		next_cmd:=false;
 		if C_usb_enum_sequence(step_cmd).usbpacket = C_usbpacket_read then
 			trame_read(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
-		else
+		elsif C_usb_enum_sequence(step_cmd).usbpacket = C_usbpacket_set then
 			trame_set(C_usb_enum_sequence(step_cmd).token,C_usb_enum_sequence(step_cmd).data);
+		else
+			plug(C_usb_enum_sequence(step_cmd).token);
 		end if;
-		step_cmd <= step_cmd+1;
-	  else
-		plug(C_PLUG_TOKEN);
-	  end if;
+		if step_cmd /= C_usb_enum_sequence'high then
+			step_cmd <= step_cmd+1;
+		end if;
 	end if;
 
   end if; -- not reset
