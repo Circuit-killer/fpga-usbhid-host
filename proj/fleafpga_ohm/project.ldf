@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BaliProject version="3.2" title="project" device="LFE5U-25F-6BG381C" default_implementation="project">
+    <Options/>
+    <Implementation title="project" dir="project" description="project" synthesis="synplify" default_strategy="Strategy1">
+        <Options def_top="fleafpga_ohm_usbtest" top="fleafpga_ohm_usbtest"/>
+        <Source name="top/fleafpga_ohm_usbtest.vhd" type="VHDL" type_short="VHDL">
+            <Options top_module="fleafpga_ohm_usbtest"/>
+        </Source>
+        <Source name="clocks/clk_25M_100M_7M5_12M_60M.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../usb_req_gen_func_pack.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../USB_ps3.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../usbhid_host.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../usb_enum_saitek_minimal_pack.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../report_decoded_pack_saitek.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="../../usbhid_report_decoder_saitek.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="FleaFPGA_Ohm_A5.lpf" type="Logic Preference" type_short="LPF">
+            <Options/>
+        </Source>
+        <Source name="fleafpga_ohm_sram.xcf" type="Programming Project File" type_short="Programming">
+            <Options/>
+        </Source>
+    </Implementation>
+    <Strategy name="Strategy1" file="ulx2s_sram1.sty"/>
+</BaliProject>
