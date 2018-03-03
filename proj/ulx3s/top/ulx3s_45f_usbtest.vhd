@@ -108,7 +108,7 @@ begin
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
-    leds => led -- led/open debug
+    leds => open -- led/open debug
   );
   --end generate;
 
@@ -127,8 +127,12 @@ begin
   usbhid_report_decoder_inst: entity usbhid_report_decoder
   generic map
   (
-    C_mousex_scaler => 24, -- less -> faster mouse
-    C_mousey_scaler => 24  -- less -> faster mouse
+    C_lmouse => true,
+    C_lmousex_scaler => 24, -- less -> faster mouse
+    C_lmousey_scaler => 24, -- less -> faster mouse
+    C_rmouse => true,
+    C_rmousex_scaler => 24, -- less -> faster mouse
+    C_rmousey_scaler => 24  -- less -> faster mouse
   )
   port map
   (
@@ -137,8 +141,12 @@ begin
     decoded => S_report_decoded
   );
 
-  -- led <= S_report_decoded.mouseq_x & S_report_decoded.mouseq_y
-  --      & S_report_decoded.btn_lstick & S_report_decoded.btn_rstick & S_report_decoded.btn_back & S_report_decoded.btn_start;
+  led <= S_report_decoded.lmouseq_x & S_report_decoded.lmouseq_y
+       & S_report_decoded.rmouseq_x & S_report_decoded.rmouseq_y;
+  -- led <= S_report_decoded.lmouseq_x & S_report_decoded.lmouseq_y
+  --      & "00" & S_report_decoded.btn_lstick & S_report_decoded.btn_back;
+  -- led <= S_report_decoded.rmouseq_x & S_report_decoded.rmouseq_y
+  --      & "00" & S_report_decoded.btn_rstick & S_report_decoded.btn_start;
   -- led <= S_lstick_left & S_lstick_right & S_lstick_up & S_lstick_down
   --      & S_rstick_left & S_rstick_right & S_rstick_up & S_rstick_down;
   -- led <= S_hat_up & S_hat_down & S_hat_left & S_hat_right & S_btn_y & S_btn_a & S_btn_x & S_btn_b;

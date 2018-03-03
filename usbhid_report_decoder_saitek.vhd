@@ -10,8 +10,12 @@ generic
 (
   C_reg_input: boolean := false; -- take input in register (release timing)
   -- mouse speed also depends on clk
-  C_mousex_scaler: integer := 24; -- less -> faster mouse
-  C_mousey_scaler: integer := 24  -- less -> faster mouse
+  C_lmouse: boolean := false;
+  C_lmousex_scaler: integer := 24; -- less -> faster mouse
+  C_lmousey_scaler: integer := 24; -- less -> faster mouse
+  C_rmouse: boolean := false;
+  C_rmousex_scaler: integer := 24; -- less -> faster mouse
+  C_rmousey_scaler: integer := 24  -- less -> faster mouse
 );
 port
 (
@@ -51,8 +55,10 @@ architecture rtl of usbhid_report_decoder is
   -- decoded stick to digital
   signal S_lstick_up, S_lstick_down, S_lstick_left, S_lstick_right: std_logic;
   signal S_rstick_up, S_rstick_down, S_rstick_left, S_rstick_right: std_logic;
-  signal R_mousecx: std_logic_vector(C_mousex_scaler-1 downto 0);
-  signal R_mousecy: std_logic_vector(C_mousey_scaler-1 downto 0);
+  signal R_lmousecx: std_logic_vector(C_lmousex_scaler-1 downto 0);
+  signal R_lmousecy: std_logic_vector(C_lmousey_scaler-1 downto 0);
+  signal R_rmousecx: std_logic_vector(C_rmousex_scaler-1 downto 0);
+  signal R_rmousecy: std_logic_vector(C_rmousey_scaler-1 downto 0);
 begin
 
   yes_reg_input: if C_reg_input generate
@@ -113,22 +119,46 @@ begin
 
   decoded.analog_trigger <= S_analog_trigger;
   
+  yes_lmouse: if C_lmouse generate
   -- mouse counters
   process(clk)
   begin
       if rising_edge(clk) then
-        R_mousecx <= R_mousecx+S_rstick_x-128;
-        R_mousecy <= R_mousecy+S_rstick_y-128;
+        R_lmousecx <= R_lmousecx+S_lstick_x-128;
+        R_lmousecy <= R_lmousecy+S_lstick_y-128;
       end if;
   end process;
 
   -- mouse quadrature encoders
-  decoded.mouseq_x  <= "01" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "00" else
-                       "11" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "01" else
-                       "10" when R_mousecx(R_mousecx'high downto R_mousecx'high-1) = "10" else
-                       "00"; -- when "11"
-  decoded.mouseq_y  <= "01" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "00" else
-                       "11" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "01" else
-                       "10" when R_mousecy(R_mousecy'high downto R_mousecy'high-1) = "10" else
-                       "00"; -- when "11"
+  decoded.lmouseq_x  <= "01" when R_lmousecx(R_lmousecx'high downto R_lmousecx'high-1) = "00" else
+                        "11" when R_lmousecx(R_lmousecx'high downto R_lmousecx'high-1) = "01" else
+                        "10" when R_lmousecx(R_lmousecx'high downto R_lmousecx'high-1) = "10" else
+                        "00"; -- when "11"
+  decoded.lmouseq_y  <= "01" when R_lmousecy(R_lmousecy'high downto R_lmousecy'high-1) = "00" else
+                        "11" when R_lmousecy(R_lmousecy'high downto R_lmousecy'high-1) = "01" else
+                        "10" when R_lmousecy(R_lmousecy'high downto R_lmousecy'high-1) = "10" else
+                        "00"; -- when "11"
+  end generate;
+
+  yes_rmouse: if C_rmouse generate
+  -- mouse counters
+  process(clk)
+  begin
+      if rising_edge(clk) then
+        R_rmousecx <= R_rmousecx+S_rstick_x-128;
+        R_rmousecy <= R_rmousecy+S_rstick_y-128;
+      end if;
+  end process;
+
+  -- mouse quadrature encoders
+  decoded.rmouseq_x  <= "01" when R_rmousecx(R_rmousecx'high downto R_rmousecx'high-1) = "00" else
+                        "11" when R_rmousecx(R_rmousecx'high downto R_rmousecx'high-1) = "01" else
+                        "10" when R_rmousecx(R_rmousecx'high downto R_rmousecx'high-1) = "10" else
+                        "00"; -- when "11"
+  decoded.rmouseq_y  <= "01" when R_rmousecy(R_rmousecy'high downto R_rmousecy'high-1) = "00" else
+                        "11" when R_rmousecy(R_rmousecy'high downto R_rmousecy'high-1) = "01" else
+                        "10" when R_rmousecy(R_rmousecy'high downto R_rmousecy'high-1) = "10" else
+                        "00"; -- when "11"
+  end generate;
+  
 end rtl;
