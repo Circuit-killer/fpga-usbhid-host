@@ -14,8 +14,8 @@ record
   lstick_up, lstick_down, lstick_left, lstick_right: std_logic;
   rstick_up, rstick_down, rstick_left, rstick_right: std_logic;
   btn_a, btn_b, btn_x, btn_y: std_logic;
-  btn_left_bumper, btn_right_bumper: std_logic;
-  btn_left_trigger, btn_right_trigger: std_logic;
+  btn_lbumper, btn_rbumper: std_logic;
+  btn_ltrigger, btn_rtrigger: std_logic;
   btn_back, btn_start: std_logic;
   btn_lstick, btn_rstick: std_logic;
   btn_fps, btn_fps_toggle: std_logic;
