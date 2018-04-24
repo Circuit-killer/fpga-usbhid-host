@@ -1,14 +1,22 @@
 -- (c) EMARD
 -- License=BSD
 
+-- Saitek Cyborg Rumble Joystick
+
+-- idVendor           0x06a3 Saitek PLC
+-- idProduct          0xf51a
+-- bcdDevice            1.00
+-- iManufacturer           1 Saitek PLC
+-- iProduct                2 Cyborg Rumble Pad
+
+-- USB low-speed (USB1.0) HID protocol
+
 library ieee;
 use ieee.std_logic_1164.all;
 
 use work.usb_req_gen_func_pack.ALL;
 
 -- USB enumeration sequence sniffed with wireshark
--- Saitek Cyborg Rumble Joystick
--- USB low-speed HID device
 
 package hid_enum_pack is
 
