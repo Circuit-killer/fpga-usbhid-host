@@ -138,8 +138,8 @@ begin
   usbhid_report_decoder_inst: entity usbhid_report_decoder
   generic map
   (
-    C_mousex_scaler => 24, -- less -> faster mouse
-    C_mousey_scaler => 24  -- less -> faster mouse
+    C_lmousex_scaler => 24, -- less -> faster mouse
+    C_lmousey_scaler => 24  -- less -> faster mouse
   )
   port map
   (
