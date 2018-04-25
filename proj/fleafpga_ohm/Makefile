@@ -31,7 +31,7 @@ $(PROJECT)/$(PROJECT)_$(PROJECT)_sram.vme: $(PROJECT)/$(PROJECT)_$(PROJECT).bit
 	LANG=C ${DDTCMD} -oft -fullvme -if fleafpga_ohm_sram.xcf -nocompress -noheader -of $@
 
 $(PROJECT)/$(PROJECT)_$(PROJECT)_flash.vme: $(PROJECT)/$(PROJECT)_$(PROJECT).mcs
-	LANG=C ${DDTCMD} -oft -fullvme -if fleafpga_ohm_flash.xcf -nocompress -noheader -of $@
+	LANG=C ${DDTCMD} -oft -fullvme -if fleafpga_ohm_flash.xcf -noheader -of $@
 
 $(PROJECT)/$(PROJECT)_$(PROJECT)_sram.svf: $(PROJECT)/$(PROJECT)_$(PROJECT).bit
 	LANG=C ${DDTCMD} -oft -svfsingle -revd -maxdata 8 -if fleafpga_ohm_sram.xcf -of $@
