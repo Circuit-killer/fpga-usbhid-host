@@ -148,7 +148,7 @@ begin
     decoded => S_report_decoded
   );
   
-  led <= S_report_decoded.btn_fps;
+  led <= S_report_decoded.btn_x;
 
   -- led <= S_report_decoded.mouseq_x & S_report_decoded.mouseq_y
   --      & S_report_decoded.btn_lstick & S_report_decoded.btn_rstick & S_report_decoded.btn_back & S_report_decoded.btn_start;
