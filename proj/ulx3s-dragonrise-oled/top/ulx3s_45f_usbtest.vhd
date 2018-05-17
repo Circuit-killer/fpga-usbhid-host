@@ -80,6 +80,7 @@ architecture Behavioral of ulx3s_usbtest is
   signal S_reset: std_logic;  
   signal S_hid_report: std_logic_vector(63 downto 0);
   signal S_report_decoded: T_report_decoded;
+  signal S_step_ps3, S_step_cmd: std_logic_vector(7 downto 0);
 begin
   clk_pll: entity work.clk_25M_100M_7M5_12M_60M
   port map
@@ -108,6 +109,8 @@ begin
     usb_data(1) => usb_fpga_dp,
     usb_data(0) => usb_fpga_dn,
     hid_report => S_hid_report,
+    dbg_step_ps3 => S_step_ps3,
+    dbg_step_cmd => S_step_cmd,
     leds => open -- led/open debug
   );
   --end generate;
@@ -152,8 +155,8 @@ begin
   -- led <= S_report_decoded.hat_up & S_report_decoded.hat_down & S_report_decoded.hat_left & S_report_decoded.hat_right 
   --      & S_report_decoded.btn_y & S_report_decoded.btn_a & S_report_decoded.btn_x & S_report_decoded.btn_b;
   led <= S_report_decoded.btn_a & S_report_decoded.btn_b & S_report_decoded.btn_x & S_report_decoded.btn_y 
-       & S_report_decoded.btn_lbumper  & S_report_decoded.btn_rbumper 
-       & S_report_decoded.btn_ltrigger & S_report_decoded.btn_rtrigger;
+         & S_report_decoded.btn_lbumper  & S_report_decoded.btn_rbumper 
+         & S_report_decoded.btn_ltrigger & S_report_decoded.btn_rtrigger;
   -- led <= "00" & S_report_decoded.btn_back & S_report_decoded.btn_start 
   --     & S_report_decoded.btn_lstick & S_report_decoded.btn_rstick & S_report_decoded.btn_fps & S_report_decoded.btn_fps_toggle;
   -- led(5 downto 0) <= S_report_decoded.analog_trigger;
@@ -169,7 +172,7 @@ begin
   (
     clk => clk_25MHz,
     en => '1',
-    data => S_hid_report,
+    data => S_hid_report(63 downto 16) & S_step_ps3(7 downto 0) & S_step_cmd(7 downto 0),
     spi_resn => oled_resn,
     spi_clk => oled_clk,
     spi_csn => oled_csn,
