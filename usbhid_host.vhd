@@ -18,6 +18,8 @@ Port
   reset      : in    std_logic := '0'; -- async reset
   USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D- both pull down 15k
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
+  dbg_step_ps3 : out std_logic_vector(7 downto 0);
+  dbg_step_cmd : out std_logic_vector(7 downto 0);
   LEDS       : out   std_logic_vector(7 downto 0)
 );
 end;
@@ -127,10 +129,11 @@ constant DEMI_PAS:integer:=2;--5/2;
 
 constant TIME_OUT:integer:=8; -- 7.5bit
 
-signal step_ps3_test:integer range 0 to 11:=0;
 signal step_cmd: integer range 0 to C_usb_enum_sequence'high := 0;
 
 begin
+
+dbg_step_cmd <= conv_std_logic_vector(step_cmd,8);
 
 process(clk) is
 	variable step_ps3:integer range 0 to 41:=0;
@@ -319,7 +322,7 @@ process(clk) is
 	variable interval:std_logic_vector(7 downto 0):=(others=>'0');
 begin
 
-step_ps3_test<=step_ps3;
+dbg_step_ps3 <= conv_std_logic_vector(step_ps3,8);
 HID_REPORT <= reverse_any_vector(JOY_mem);
 
 if rising_edge(clk) then
