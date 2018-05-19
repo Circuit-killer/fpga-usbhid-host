@@ -78,9 +78,9 @@ In a second after start, "dbg_step_cmd" states should advance from 0d=0000b to t
 halfway and final state is not reached, joystick surely won't work so try to 
 disable or change some packet being send before that.
 
-"dbg_step_ps3" will mormally be in state 0x22 most of the time.
+"dbg_step_ps3" will mormally be in state 34d=22h most of the time.
 "dragonrise" joystick will work for few seconds or minutes,
-when it gets stuck at state 0x26.
+then it will get stuck at state 38d=26h.
 
 When final dbg_step_cmd state is reached, pressing joystick buttons should blink
 some lights in upper 4 LED bits. Check that pressing of the buttons
