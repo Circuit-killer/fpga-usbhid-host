@@ -68,12 +68,21 @@ On Lower 4 LED bits is shown state of the packet replay machine.
 Keep the joystick plugged in, upload the bitstream over jtag and
 watch lower 4 LEDs.
 
-In a second, machine states should advance from 0d=0000b to the final state 
-2d=0010b for "usb_enum_saitek_minimal_pack.vhd" example. If it stops 
+"usbhid_host.vhd" has debug output of its states:
+
+    dbg_step_ps3 (USB host state machine, about 40 states)
+    dbg_step_cmd (Initialization command counter, about 10 states).
+
+In a second after start, "dbg_step_cmd" states should advance from 0d=0000b to the final state 
+2d=0010b=02h for "usb_enum_saitek_minimal_pack.vhd" example. If it stops 
 halfway and final state is not reached, joystick surely won't work so try to 
 disable or change some packet being send before that.
 
-When final state is reached, pressing joystick buttons should blink
+"dbg_step_ps3" will mormally be in state 0x22 most of the time.
+"dragonrise" joystick will work for few seconds or minutes,
+when it gets stuck at state 0x26.
+
+When final dbg_step_cmd state is reached, pressing joystick buttons should blink
 some lights in upper 4 LED bits. Check that pressing of the buttons
 drives LED without any noticeable delay.
 
