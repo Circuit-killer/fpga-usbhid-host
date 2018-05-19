@@ -95,6 +95,11 @@ If joystick is re-plugged, it will stop working until "reset" signal
 is issued. Sometimes even reset doens't work, so reload FPGA bitstream
 might help. State machine could be improved for user convenience.
 
+Debugging is difficult because for example "dragonrise" joystick
+works perfectly when states are monitored on OLED display. But
+when display is disconnected, USB state machine gets stuck after
+few seconds or few minutes.
+
 # Additional info from original source
 
 some info on it
