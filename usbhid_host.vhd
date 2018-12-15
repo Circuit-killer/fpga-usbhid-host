@@ -10,6 +10,7 @@ use work.usbhid_decoded_pack.all;
 entity usbhid_host is
 Generic
 (
+  C_differential_mode: boolean := false; -- use differential input
   REPORT_LEN : integer := 8 -- bytes report len
 );
 Port
@@ -17,6 +18,7 @@ Port
   clk        : in    std_logic; -- 7.5 MHz clock for USB1.0, 60 MHz for USB1.1
   reset      : in    std_logic := '0'; -- async reset
   USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D- both pull down 15k
+  USB_DDATA  : in    std_logic := '0'; -- USB_DDATA(1)=D+ USB_DDATA(0)=D- differential input
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
   dbg_step_ps3 : out std_logic_vector(7 downto 0);
   dbg_step_cmd : out std_logic_vector(7 downto 0);
@@ -45,7 +47,16 @@ begin
 		return '1';
 	end if;
 end function;
-	
+
+function ddata2bit(d:std_logic) return std_logic is
+begin
+	if d=ZERO(1) then
+		return '0';
+	else
+		return '1';
+	end if;
+end function;
+
 
 constant SYNCHRO:std_logic_vector(7 downto 0):="01010100";
 
@@ -131,9 +142,19 @@ constant TIME_OUT:integer:=8; -- 7.5bit
 
 signal step_cmd: integer range 0 to C_usb_enum_sequence'high := 0;
 
+signal S_data2bit: std_logic;
+
 begin
 
 dbg_step_cmd <= conv_std_logic_vector(step_cmd,8);
+G_no_differential:
+if not C_differential_mode generate
+  S_data2bit <= data2bit(USB_DATA);
+end generate;
+G_yes_differential:
+if C_differential_mode generate
+  S_data2bit <= ddata2bit(USB_DDATA);
+end generate;
 
 process(clk) is
 	variable step_ps3:integer range 0 to 41:=0;
@@ -354,7 +375,7 @@ if rising_edge(clk) then
 		if counter_PAS=DEMI_PAS then
 			if mode_receive then
 				--nrzi('0',last_nrzi,result);
-				nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+				nrzi_inv(S_data2bit,last_nrzi,result);
 				if result='0' then
 					--cool
 				else
@@ -528,14 +549,14 @@ if rising_edge(clk) then
 			when 10=> -- reception ACK ????
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=11;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+ACK'length then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						if not(result=ACK(8+ACK'length -1-counter_TRAME)) then
 							-- pas cool

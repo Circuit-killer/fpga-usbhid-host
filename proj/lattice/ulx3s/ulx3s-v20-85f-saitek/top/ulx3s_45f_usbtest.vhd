@@ -53,8 +53,8 @@ entity ulx3s_usbtest is
   gp, gn: inout std_logic_vector(27 downto 0) := (others => 'Z');
   
   -- FPGA direct USB connector
-  usb_fpga_dp, usb_fpga_dn: inout std_logic;
-  usb_fpga_bd_dp, usb_fpga_bd_dn: inout std_logic; -- bidirectional differential
+  usb_fpga_dp: in std_logic; -- differential input
+  usb_fpga_bd_dp, usb_fpga_bd_dn: inout std_logic; -- single ended bidirectional
   usb_fpga_pu_dp, usb_fpga_pu_dn: inout std_logic; -- pull up for slave, down for host mode
 
   -- SHUTDOWN: logic '1' here will shutdown power on PCB >= v1.7.5
@@ -104,17 +104,20 @@ begin
   -- USB D+,D- pull down for host mode
   usb_fpga_pu_dp <= 'Z';
   usb_fpga_pu_dn <= 'Z';
-  usb_fpga_bd_dp <= 'Z';
-  usb_fpga_bd_dn <= 'Z';
 
   --u1: if true generate
   usbhid_host_inst: entity usbhid_host
+  generic map
+  (
+    C_differential_mode => true
+  )
   port map
   (
     clk => clk_7M5Hz,
     reset => S_reset,
-    usb_data(1) => usb_fpga_dp,
-    usb_data(0) => usb_fpga_dn,
+    usb_data(1) => usb_fpga_bd_dp,
+    usb_data(0) => usb_fpga_bd_dn,
+    usb_ddata => usb_fpga_dp,
     hid_report => S_hid_report,
     dbg_step_ps3 => S_step_ps3,
     dbg_step_cmd => S_step_cmd,
