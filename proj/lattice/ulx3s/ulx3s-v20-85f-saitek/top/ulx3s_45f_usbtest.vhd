@@ -155,7 +155,7 @@ begin
   );
 
   -- see the HID report on the OLED
-  g_oled: if false generate
+  g_oled: if true generate
   oled_inst: entity work.oled
   generic map
   (
