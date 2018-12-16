@@ -7,14 +7,10 @@ use ieee.std_logic_1164.all;
 use work.usb_req_gen_func_pack.ALL;
 
 -- USB enumeration sequence sniffed with wireshark
--- Logitech NetPlay keyboard
+-- Logitech mouse
 -- USB low-speed HID device
 
--- warning it doesn't work for NetPlay keyboard - something in the communication
--- doesn't work, it gets randomly stuck during state propagation
-
--- it doesn't work in single-ended mode for Logitech mouse,
--- but it works for logitech mouse in differential input mode
+-- it works for logitech mouse in single-ended and differential input mode
 
 package hid_enum_pack is
 
@@ -81,7 +77,7 @@ record
     token:      std_logic_vector(15 downto 0); -- usb token 16-bit (5-bit crc included)
     data:       std_logic_vector(87 downto 0); -- usb data 88-bit (16-bit crc included)
 end record;
-type T_usb_enum_sequence is array (0 to 11) of T_usb_message;
+type T_usb_enum_sequence is array (0 to 4) of T_usb_message;
 constant C_usb_enum_sequence: T_usb_enum_sequence :=
   (
     ( -- 0
@@ -95,51 +91,16 @@ constant C_usb_enum_sequence: T_usb_enum_sequence :=
       data      =>  C_GET_DESCRIPTOR_DEVICE_12h
     ),
     ( -- 2
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_CONFIG_09h
-    ),
-    ( -- 3
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_CONFIG_22h
-    ),
-    ( -- 4
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_STRING_0_FFh
-    ),
-    ( -- 5
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_STRING_1_FFh
-    ),
-    ( -- 6
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_STRING_2_FFh
-    ),
-    ( -- 7
       usbpacket =>  C_usbpacket_set,
       token     =>  C_ADDR0_ENDP0,
       data      =>  C_SET_CONFIGURATION_1
     ),
-    ( -- 8
-      usbpacket =>  C_usbpacket_read,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_GET_DESCRIPTOR_REPORT_41h
-    ),
-    ( -- 9
-      usbpacket =>  C_usbpacket_set,
-      token     =>  C_ADDR0_ENDP0,
-      data      =>  C_SET_REPORT_REQUEST_200h
-    ),
-    ( -- 10
+    ( -- 3
       usbpacket =>  C_usbpacket_plug,
       token     =>  C_ADDR0_ENDP0,
       data      =>  (others => '-')
     ),
-    ( -- 11
+    ( -- 4
       usbpacket =>  C_usbpacket_plug,
       token     =>  C_ADDR0_ENDP1,
       data      =>  (others => '-')

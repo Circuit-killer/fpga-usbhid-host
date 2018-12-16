@@ -109,7 +109,7 @@ begin
   usbhid_host_inst: entity usbhid_host
   generic map
   (
-    C_differential_mode => true
+    C_differential_mode => false
   )
   port map
   (
