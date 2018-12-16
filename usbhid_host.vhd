@@ -18,7 +18,7 @@ Port
   clk        : in    std_logic; -- 7.5 MHz clock for USB1.0, 60 MHz for USB1.1
   reset      : in    std_logic := '0'; -- async reset
   USB_DATA   : inout std_logic_vector(1 downto 0); -- USB_DATA(1)=D+ USB_DATA(0)=D- both pull down 15k
-  USB_DDATA  : in    std_logic := '0'; -- USB_DDATA(1)=D+ USB_DDATA(0)=D- differential input
+  USB_DDATA  : in    std_logic; -- D+ from differential input
   HID_REPORT : out   std_logic_vector(8*REPORT_LEN-1 downto 0);
   dbg_step_ps3 : out std_logic_vector(7 downto 0);
   dbg_step_cmd : out std_logic_vector(7 downto 0);
@@ -38,25 +38,6 @@ begin
 		return UN;
 	end if;
 end function;
-
-function data2bit(d:std_logic_vector(1 downto 0)) return std_logic is
-begin
-	if d=ZERO then
-		return '0';
-	else
-		return '1';
-	end if;
-end function;
-
-function ddata2bit(d:std_logic) return std_logic is
-begin
-	if d=ZERO(1) then
-		return '0';
-	else
-		return '1';
-	end if;
-end function;
-
 
 constant SYNCHRO:std_logic_vector(7 downto 0):="01010100";
 
@@ -149,11 +130,11 @@ begin
 dbg_step_cmd <= conv_std_logic_vector(step_cmd,8);
 G_no_differential:
 if not C_differential_mode generate
-  S_data2bit <= data2bit(USB_DATA);
+  S_data2bit <= '0' when USB_DATA=ZERO else '1';
 end generate;
 G_yes_differential:
 if C_differential_mode generate
-  S_data2bit <= ddata2bit(USB_DDATA);
+  S_data2bit <= '0' when USB_DDATA=ZERO(1) else '1';
 end generate;
 
 process(clk) is
@@ -663,14 +644,14 @@ if rising_edge(clk) then
 			when 15=>
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=16;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+8 then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						PID_mem(8+8 -1-counter_TRAME):=result;
 						if counter_TRAME=8+8-1 then
@@ -691,7 +672,7 @@ if rising_edge(clk) then
 						mode_receive:=false;
 						step_ps3:=17;
 					else
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						-- DATA & CRC16
 					end if;
@@ -829,14 +810,14 @@ if rising_edge(clk) then
 			when 21=> -- reception ACK
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=22;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+ACK'length then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						if not(result=ACK(8+ACK'length -1-counter_TRAME)) then
 							-- pas cool
@@ -943,14 +924,14 @@ if rising_edge(clk) then
 			when 26=>
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=27;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+8 then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						PID_mem(8+8 -1-counter_TRAME):=result;
 						if counter_TRAME=8+8-1 then
@@ -982,7 +963,7 @@ if rising_edge(clk) then
 							end if;
 						end if;
 					else
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						if counter_TRAME>=8+8+16 then
 							crc16_value:=crc16(CRC16_mem(15),crc16_value);
@@ -1160,14 +1141,14 @@ if rising_edge(clk) then
 			when 32=> -- reception ACK
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=33;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+ACK'length then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						if not(result=ACK(8+ACK'length -1-counter_TRAME)) then
 							-- pas cool
@@ -1284,14 +1265,14 @@ if rising_edge(clk) then
 			when 37=>
 				if counter_PAS=DEMI_PAS then
 					if counter_TRAME<8 then
-						if not(SYNCHRO(8 -1-counter_TRAME)=data2bit(USB_DATA)) then
+						if not(SYNCHRO(8 -1-counter_TRAME)=S_data2bit) then
 							-- pas cool
 							step_ps3:=38;counter_TRAME:=0;mode_receive:=false;
 						end if;
 						stuff_init;
 						nrzi_init;
 					elsif counter_TRAME<8+8 then
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						
 						PID_mem(8+8 -1-counter_TRAME):=result;
@@ -1331,7 +1312,7 @@ if rising_edge(clk) then
 								end if;
 							end if;
 					else
-						nrzi_inv(data2bit(USB_DATA),last_nrzi,result);
+						nrzi_inv(S_data2bit,last_nrzi,result);
 						stuff(result);
 						if counter_TRAME>=8+8+16 then
 							crc16_value:=crc16(CRC16_mem(15),crc16_value);
