@@ -69,7 +69,7 @@ constant C_GET_DESCRIPTOR_REPORT_41h  : std_logic_vector(11*8-1 downto 0) := usb
 constant C_SET_REPORT_REQUEST_200h    : std_logic_vector(11*8-1 downto 0) := usb_data_gen(C_DATA0 & x"21_09_00_02_00_00_01_00");
 -- final token that will read HID reports
 constant bInterval: std_logic_vector(7 downto 0) := x"01"; -- HID report interval, lower value means faster
-constant C_IDLE_REPORT: std_logic_vector(63 downto 0) := x"70_00_00_80_80_80_80_00"; -- report when unplugged
+constant C_IDLE_REPORT: std_logic_vector(31 downto 0) := x"00_00_00_00"; -- report when unplugged
 
 type T_usb_message is
 record

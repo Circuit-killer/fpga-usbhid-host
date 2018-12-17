@@ -109,7 +109,8 @@ begin
   usbhid_host_inst: entity usbhid_host
   generic map
   (
-    C_differential_mode => false
+    C_differential_mode => false,
+    report_len => 4
   )
   port map
   (
@@ -118,7 +119,7 @@ begin
     usb_data(1) => usb_fpga_bd_dp,
     usb_data(0) => usb_fpga_bd_dn,
     usb_ddata => usb_fpga_dp,
-    hid_report => S_hid_report,
+    hid_report => S_hid_report(63 downto 32),
     dbg_step_ps3 => S_step_ps3,
     dbg_step_cmd => S_step_cmd,
     leds => open -- led/open debug

@@ -336,21 +336,21 @@ if rising_edge(clk) then
   end if; -- reset
 
   if reset='0' then
-	LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
+	--LEDS(3 downto 0)<=conv_std_logic_vector(step_cmd,8)(3 downto 0);
 	--LEDS<=conv_std_logic_vector(step_ps3,8);
 
-        button_blink: if true then
-	for i in 4 to 7 loop
-	  LEDS(i)<= JOY_mem(i + 8*0)
-	        xor JOY_mem(i + 8*1)
-	        xor JOY_mem(i + 8*2)
-	        xor JOY_mem(i + 8*3)
-	        xor JOY_mem(i + 8*4)
-	        xor JOY_mem(i + 8*5)
-	        xor JOY_mem(i + 8*6)
-	        xor JOY_mem(i + 8*7);
-	end loop;
-	end if;
+        --button_blink: if true then
+	--for i in 4 to 7 loop
+	--  LEDS(i)<= JOY_mem(i + 8*0)
+	--        xor JOY_mem(i + 8*1)
+	--        xor JOY_mem(i + 8*2)
+	--        xor JOY_mem(i + 8*3)
+	--        xor JOY_mem(i + 8*4)
+	--        xor JOY_mem(i + 8*5)
+	--        xor JOY_mem(i + 8*6)
+	--        xor JOY_mem(i + 8*7);
+	--end loop;
+	--end if;
 
 	if zap then
 		if counter_PAS=DEMI_PAS then
