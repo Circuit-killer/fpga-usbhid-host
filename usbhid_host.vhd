@@ -169,8 +169,8 @@ process(clk) is
 		variable b:std_logic;
 		variable crc:std_logic_vector(4 downto 0);
 	begin
-		crc:=crc5; -- frontière pour a=f(a);
-		b:=d; -- frontière (parano ?)
+		crc:=crc5; -- frontiÃ¨re pour a=f(a);
+		b:=d; -- frontiÃ¨re (parano ?)
 		a:=crc(4) xor b;
 		crc:=crc(3 downto 0) & a;
 		crc(2):=crc(2) xor a;
@@ -190,8 +190,8 @@ process(clk) is
 		variable b:std_logic;
 		variable crc:std_logic_vector(15 downto 0);
 	begin
-		crc:=crc16; -- frontière pour a=f(a);
-		b:=d; -- frontière (parano ?)
+		crc:=crc16; -- frontiÃ¨re pour a=f(a);
+		b:=d; -- frontiÃ¨re (parano ?)
 		a:=crc(15) xor b;
 		crc:=crc(14 downto 0) & a;
 		crc(2):=crc(2) xor a;
@@ -448,7 +448,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -483,7 +483,7 @@ if rising_edge(clk) then
 						USB_DATA<=bit2data(result);
 					elsif counter_TRAME<8+TRAME_SET_SETUP'length+2 then
 						USB_DATA<=EOP;
-					elsif counter_TRAME<8+TRAME_SET_SETUP'length+2+5 then -- on va dire 5 à la place de 3 IDLE
+					elsif counter_TRAME<8+TRAME_SET_SETUP'length+2+5 then -- on va dire 5 Ã  la place de 3 IDLE
 						USB_DATA<=UN;
 					elsif counter_TRAME<8+TRAME_SET_SETUP'length+2+5 +8 then
 						USB_DATA<=bit2data(SYNCHRO(8+TRAME_SET_SETUP'length+2+5 +8 -1-counter_TRAME));
@@ -554,7 +554,7 @@ if rising_edge(clk) then
 				end if;
 			when 11=>
 				-- wait EOP
-				if counter_PAS=DEMI_PAS and USB_DATA=EOP then -- DEMI_PAS ? plus long ??? ne pas rendre un "entre deux états"
+				if counter_PAS=DEMI_PAS and USB_DATA=EOP then -- DEMI_PAS ? plus long ??? ne pas rendre un "entre deux Ã©tats"
 					pause(5);
 					time_out:=true;
 					step_ps3:=7; --next SOF
@@ -575,7 +575,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -728,7 +728,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -763,7 +763,7 @@ if rising_edge(clk) then
 						USB_DATA<=bit2data(result);
 					elsif counter_TRAME<8+TRAME_GET_SETUP'length+2 then
 						USB_DATA<=EOP;
-					elsif counter_TRAME<8+TRAME_GET_SETUP'length+2+5 then -- on va dire 5 à la place de 3 IDLE
+					elsif counter_TRAME<8+TRAME_GET_SETUP'length+2+5 then -- on va dire 5 Ã  la place de 3 IDLE
 						USB_DATA<=UN;
 					elsif counter_TRAME<8+TRAME_GET_SETUP'length+2+5 +8 then
 						USB_DATA<=bit2data(SYNCHRO(8+TRAME_GET_SETUP'length+2+5 +8 -1-counter_TRAME));
@@ -855,7 +855,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -1059,7 +1059,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -1094,7 +1094,7 @@ if rising_edge(clk) then
 						USB_DATA<=bit2data(result);
 					elsif counter_TRAME<8+OUT_ADDR_ENDP'length+2 then
 						USB_DATA<=EOP;
-					elsif counter_TRAME<8+OUT_ADDR_ENDP'length+2+5 then -- on va dire 5 à la place de 3 IDLE
+					elsif counter_TRAME<8+OUT_ADDR_ENDP'length+2+5 then -- on va dire 5 Ã  la place de 3 IDLE
 						USB_DATA<=UN;
 					elsif counter_TRAME<8+OUT_ADDR_ENDP'length+2+5 +8 then
 						USB_DATA<=bit2data(SYNCHRO(8+OUT_ADDR_ENDP'length+2+5 +8 -1-counter_TRAME));
@@ -1174,7 +1174,7 @@ if rising_edge(clk) then
 			--=============================
 			-- PLUG (SOF,IN_ADDR_ENDP,ACK)
 			--=============================
-			-- toujours vide, non lancé du coup
+			-- toujours vide, non lancÃ© du coup
 			when 34=>
 			--PID_SOF
 				--frame_number 0 to 11
@@ -1188,7 +1188,7 @@ if rising_edge(clk) then
 						nrzi(SOF(8+8 -1-counter_TRAME),last_nrzi,result);
 						USB_DATA<=bit2data(result);
 						crc5_init;
-					elsif counter_TRAME<8+8+11 then -- stuff osef (si ça passe pas, ça passe pas)
+					elsif counter_TRAME<8+8+11 then -- stuff osef (si Ã§a passe pas, Ã§a passe pas)
 						stuff(frame_number(counter_TRAME-8-8));
 						nrzi(frame_number(counter_TRAME-8-8),last_nrzi,result);
 						USB_DATA<=bit2data(result);
@@ -1282,7 +1282,7 @@ if rising_edge(clk) then
 							if PID_mem=DATA0 or PID_mem=DATA1 then
 								--cool
 							elsif PID_mem=STALL then
-							--	-- RESET ALL : mauvaise idée : un reset ça prend du temps, ce n'est donc pas une réaction normale du système
+							--	-- RESET ALL : mauvaise idÃ©e : un reset Ã§a prend du temps, ce n'est donc pas une rÃ©action normale du systÃ¨me
 							--	counter_TRAME:=0;mode_receive:=false;	
 							--	pause(5);
 							--	time_out:=true;
