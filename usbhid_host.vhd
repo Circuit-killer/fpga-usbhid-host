@@ -109,15 +109,17 @@ constant SOF:std_logic_vector(7 downto 0):="10100101"; -- non NRZI
 
 constant IN_IN:std_logic_vector(7 downto 0):="10010110";
 
-constant period_RESET:integer:=1486684; --100-200ms >1486684< + 96147; --
+constant PAS:integer:=5;
+constant DEMI_PAS:integer:=2;--5/2;
+
+-- 198ms at  7.5MHz // USB_MUL=1 Low Speed
+-- 198ms at 60.0MHz // USB_MUL=8 Full Speed
+constant period_RESET:integer:=297336*PAS*USB_MUL; --about 200ms
 
 constant period_IDLE:integer:=409;
 constant period_EOP:integer:=1;
 
 constant period_SOF:integer:=12000; --11890+8+3*8+2; --11924
-
-constant PAS:integer:=5;
-constant DEMI_PAS:integer:=2;--5/2;
 
 constant TIME_OUT:integer:=8; -- 7.5bit
 
@@ -140,7 +142,7 @@ end generate;
 process(clk) is
 	variable step_ps3:integer range 0 to 41:=0;
 	variable next_cmd:boolean:=false;
-	variable counter_RESET:integer range 0 to period_RESET*PAS:=0;
+	variable counter_RESET:integer range 0 to period_RESET:=0;
 	variable counter_IDLE:integer range 0 to period_IDLE+period_EOP:=0;
 	variable counter_PAS:integer range 0 to PAS:=0;
 	variable counter_SOF_stuff:integer range 0 to period_SOF:=0;
@@ -411,7 +413,7 @@ if rising_edge(clk) then
 			--=======
 			when 4=>
 				USB_DATA<=EOP;
-				if counter_RESET=period_RESET*PAS-1 then
+				if counter_RESET=period_RESET-1 then
 					counter_RESET:=0;
 					step_ps3:=5;
 					USB_DATA<="ZZ";
