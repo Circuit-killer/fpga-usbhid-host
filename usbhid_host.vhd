@@ -544,7 +544,7 @@ if rising_edge(clk) then
 							step_ps3:=11;counter_TRAME:=0;mode_receive:=false;
 						end if;
 					else
-						pause(5);
+						pause(PAS);
 						time_out:=true;
 						step_ps3:=12; --next INSTRUCTION
 					end if;
@@ -555,7 +555,7 @@ if rising_edge(clk) then
 			when 11=>
 				-- wait EOP
 				if counter_PAS=DEMI_PAS and USB_DATA=EOP then -- DEMI_PAS ? plus long ??? ne pas rendre un "entre deux états"
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=7; --next SOF
 				end if;
@@ -668,7 +668,7 @@ if rising_edge(clk) then
 					elsif USB_DATA=EOP then
 						SIZE_mem:=conv_std_logic_vector(counter_TRAME-16-16,8); -- NO_DATA=0
 						counter_TRAME:=0;
-						pause(5);
+						pause(PAS);
 						mode_receive:=false;
 						step_ps3:=17;
 					else
@@ -683,7 +683,7 @@ if rising_edge(clk) then
 			when 16=>
 				-- wait EOP
 				if USB_DATA=EOP and counter_PAS=DEMI_PAS then
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=12; -- next SOF
 				end if;
@@ -703,7 +703,7 @@ if rising_edge(clk) then
 					elsif counter_TRAME<8+ACK'length+2+1 then
 						USB_DATA<=UN;
 					else
-						pause(3);
+						pause(PAS-DEMI_PAS);
 						time_out:=true;
 						step_ps3:=1;-- next SOF next INSTRUCTION
 						next_cmd:=true;
@@ -824,7 +824,7 @@ if rising_edge(clk) then
 							step_ps3:=22;counter_TRAME:=0;mode_receive:=false;
 						end if;
 					else
-						pause(5);
+						pause(PAS);
 						time_out:=true;
 							step_ps3:=23; --24; next INSTRUCTION
 					end if;
@@ -835,7 +835,7 @@ if rising_edge(clk) then
 			when 22=>
 				-- wait EOP
 				if USB_DATA=EOP and counter_PAS=DEMI_PAS then
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=18; -- next SOF
 				end if;
@@ -949,7 +949,7 @@ if rising_edge(clk) then
 					elsif USB_DATA=EOP then
 						SIZE_mem:=conv_std_logic_vector(counter_TRAME-16-16,8);
 						counter_TRAME:=0;
-						pause(5);
+						pause(PAS);
 						mode_receive:=false;
 						step_ps3:=28;
 						if conv_integer(SIZE_mem)>0 then
@@ -983,7 +983,7 @@ if rising_edge(clk) then
 			when 27=>
 				-- wait EOP
 				if USB_DATA=EOP and counter_PAS=DEMI_PAS then
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=23; -- next SOF
 				end if;
@@ -1003,7 +1003,7 @@ if rising_edge(clk) then
 					elsif counter_TRAME<8+ACK'length+2+1 then
 						USB_DATA<=UN;
 					else
-						pause(3);
+						pause(PAS-DEMI_PAS);
 						time_out:=true;
 						if conv_integer(SIZE_mem)=DATA_MAX_SIZE then
 							--encore !
@@ -1034,7 +1034,7 @@ if rising_edge(clk) then
 					elsif counter_TRAME<8+NACK'length+2+1 then
 						USB_DATA<=UN;
 					else
-						pause(3);
+						pause(PAS-DEMI_PAS);
 						time_out:=true;
 						--encore !
 						step_ps3:=23; -- next SOF
@@ -1155,7 +1155,7 @@ if rising_edge(clk) then
 							step_ps3:=33;counter_TRAME:=0;mode_receive:=false;
 						end if;
 					else
-						pause(5);
+						pause(PAS);
 						time_out:=true;
 							step_ps3:=1; -- next INSTRUCTION
 							next_cmd:=true;
@@ -1167,7 +1167,7 @@ if rising_edge(clk) then
 			when 33=>
 				-- wait EOP
 				if USB_DATA=EOP and counter_PAS=DEMI_PAS then
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=29; -- next SOF
 				end if;
@@ -1284,7 +1284,7 @@ if rising_edge(clk) then
 							elsif PID_mem=STALL then
 							--	-- RESET ALL : mauvaise idée : un reset ça prend du temps, ce n'est donc pas une réaction normale du système
 							--	counter_TRAME:=0;mode_receive:=false;	
-							--	pause(5);
+							--	pause(PAS);
 							--	time_out:=true;
 							--	step_ps3:=0;-- next INSTRUCTION
 							--	step_cmd:=0;
@@ -1298,7 +1298,7 @@ if rising_edge(clk) then
 					elsif USB_DATA=EOP then
 							SIZE_mem:=conv_std_logic_vector(counter_TRAME-16-16,8);
 							counter_TRAME:=0;
-							pause(5);
+							pause(PAS);
 							mode_receive:=false;
 							step_ps3:=39;
 							if conv_integer(SIZE_mem)>0 then
@@ -1335,7 +1335,7 @@ if rising_edge(clk) then
 			when 38=>
 				-- wait EOP
 				if USB_DATA=EOP and counter_PAS=DEMI_PAS then
-					pause(5);
+					pause(PAS);
 					time_out:=true;
 					step_ps3:=34; -- next SOF
 				end if;
@@ -1355,7 +1355,7 @@ if rising_edge(clk) then
 					elsif counter_TRAME<8+ACK'length+2+1 then
 						USB_DATA<=UN;
 					else
-						pause(3);
+						pause(PAS-DEMI_PAS);
 						time_out:=true;
 						step_ps3:=1;-- loop -- next SOF next INSTRUCTION
 						next_cmd:=true;
@@ -1380,7 +1380,7 @@ if rising_edge(clk) then
 					elsif counter_TRAME<8+NACK'length+2+1 then
 						USB_DATA<=UN;
 					else
-						pause(3);
+						pause(PAS-DEMI_PAS);
 						time_out:=true;
 						step_ps3:=1;-- loop -- next SOF next INSTRUCTION
 						next_cmd:=true;
