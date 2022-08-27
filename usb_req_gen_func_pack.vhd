@@ -6,7 +6,7 @@ library ieee;
   use ieee.std_logic_unsigned.all;
 
 package usb_req_gen_func_pack is
-  function reverse_any_vecetor(a: std_logic_vector) return std_logic_vector;
+  function reverse_any_vector(a: std_logic_vector) return std_logic_vector;
   function usb_token_gen(input_data: std_logic_vector(10 downto 0)) return std_logic_vector;
   function usb_data_gen(input_data: std_logic_vector(71 downto 0)) return std_logic_vector;
 end;
